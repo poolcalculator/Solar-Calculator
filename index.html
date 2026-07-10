@@ -1,4 +1,6 @@
-<!DOCTYPE html>
+
+
+          <!DOCTYPE html>
 <!-- saved from url=(0074)file:///C:/Users/Pedro%20Anselmo/Downloads/solar-calculator-usd%20(1).html -->
 <html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
@@ -297,7 +299,7 @@
   .roof-img-wrap img{ position:absolute; inset:0; width:100%; height:100%; margin-bottom:0; object-fit:cover; }
   .panel-overlay{ position:absolute; inset:0; pointer-events:none; }
   .panel-marker{
-    position:absolute; transform: translate(-50%,-50%);
+    position:absolute;
     border-radius: 1.5px;
     box-shadow: 0 0 0 1px rgba(0,0,0,0.35);
     opacity: 0.92;
@@ -1109,18 +1111,25 @@ function renderPanelOverlay(placeSouth, placeWest, placeEast){
   const metersPerPixel = 156543.03392 * Math.cos(map.centerLat * Math.PI / 180) / Math.pow(2, map.zoom);
   const wM = roofPanelData.panelWidthMeters, hM = roofPanelData.panelHeightMeters;
 
+  // Baseline compass bearing for a "perfectly aligned" slope in each direction —
+  // real roofs are rarely exactly on-axis with true north, so we rotate each
+  // panel by however far its actual roof-segment azimuth deviates from this.
+  const REFERENCE_AZIMUTH = { 'dir-south': 180, 'dir-east': 90, 'dir-west': 270 };
+
   const draw = (list, count, dirClass) => {
     list.slice(0, count).forEach((p) => {
       const px = latLngToPixel(p.lat, p.lng, map);
       const landscape = (p.orientation || 'LANDSCAPE') === 'LANDSCAPE';
       const wPx = ((landscape ? hM : wM) / metersPerPixel) * 1.06;
       const hPx = ((landscape ? wM : hM) / metersPerPixel) * 1.06;
+      const rotation = (p.azimuth != null) ? (p.azimuth - REFERENCE_AZIMUTH[dirClass]) : 0;
       const marker = document.createElement('div');
       marker.className = `panel-marker ${dirClass}`;
       marker.style.left = `${(px.x / map.width) * 100}%`;
       marker.style.top = `${(px.y / map.height) * 100}%`;
       marker.style.width = `${(wPx / map.width) * 100}%`;
       marker.style.height = `${(hPx / map.height) * 100}%`;
+      marker.style.transform = `translate(-50%,-50%) rotate(${rotation}deg)`;
       overlay.appendChild(marker);
     });
   };
