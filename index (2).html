@@ -1,0 +1,1355 @@
+<!DOCTYPE html>
+<!-- saved from url=(0074)file:///C:/Users/Pedro%20Anselmo/Downloads/solar-calculator-usd%20(1).html -->
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Solar Sizing Calculator · 115%</title>
+<link rel="preconnect" href="https://fonts.googleapis.com/">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sora:wght@600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #0B1220;
+    --bg-alt: #101A2E;
+    --card: #131F38;
+    --card-border: #223252;
+    --sun: #FFB627;
+    --sun-soft: #7A5A1E;
+    --teal: #5EEAD4;
+    --text: #EAF0FB;
+    --text-dim: #8FA0BF;
+    --text-faint: #5B6C8C;
+    --danger: #FF8A65;
+    --radius: 16px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:
+      radial-gradient(ellipse 900px 500px at 15% -10%, rgba(255,182,39,0.10), transparent 60%),
+      radial-gradient(ellipse 700px 500px at 110% 10%, rgba(94,234,212,0.08), transparent 60%),
+      var(--bg);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    min-height: 100vh;
+    padding: 32px 16px 64px;
+  }
+  .wrap{max-width: 560px; margin: 0 auto;}
+
+  .lang-switch{
+    display:flex; justify-content:flex-end; gap:8px; margin-bottom:18px;
+  }
+  .lang-btn{
+    display:flex; flex-direction:column; align-items:center; gap:2px;
+    background: var(--bg-alt); border:1px solid var(--card-border);
+    border-radius: 12px; padding:6px 10px; cursor:pointer;
+    font-family:'JetBrains Mono', monospace; font-size:10px; font-weight:600;
+    color: var(--text-faint); transition: all .15s ease;
+  }
+  .lang-btn .flag{ width:28px; height:19px; border-radius:2px; display:block; box-shadow: 0 0 0 1px rgba(255,255,255,0.15); }
+  .lang-btn:hover{ border-color: var(--text-faint); color: var(--text-dim); transform: translateY(-1px); }
+  .lang-btn.active{ border-color: var(--sun); color: var(--text); background: rgba(255,182,39,0.1); }
+
+  .eyebrow{
+    font-family:'JetBrains Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--sun);
+    display:flex;
+    align-items:center;
+    gap:8px;
+    margin-bottom: 14px;
+  }
+  .eyebrow::before{
+    content:'';
+    width:6px; height:6px; border-radius:50%;
+    background: var(--sun);
+    box-shadow: 0 0 8px var(--sun);
+  }
+  h1{
+    font-family:'Sora', sans-serif;
+    font-weight: 800;
+    font-size: 36px;
+    line-height: 1.12;
+    margin: 0 0 14px;
+    letter-spacing: -0.02em;
+  }
+  h1 .hl-sun{ color: var(--sun); }
+  h1 .hl-teal{ color: var(--teal); }
+  .subtitle{
+    color: var(--text-dim);
+    font-size: 15.5px;
+    line-height: 1.55;
+    margin: 0 0 26px;
+    max-width: 46ch;
+  }
+
+  /* --- Hero: satellite roof scan signature element --- */
+  .hero-scan-wrap{
+    position: relative;
+    margin: 0 0 26px;
+    border-radius: var(--radius);
+    background: radial-gradient(ellipse 400px 260px at 50% 40%, rgba(94,234,212,0.07), transparent 70%), var(--card);
+    border: 1px solid var(--card-border);
+    padding: 18px 18px 14px;
+    overflow: hidden;
+  }
+  .hero-scan-wrap svg{ display:block; width:100%; height:auto; }
+  .hero-scan-caption{
+    display:flex; align-items:center; justify-content:space-between;
+    margin-top: 10px; padding-top: 12px; border-top: 1px dashed var(--card-border);
+    font-family:'JetBrains Mono', monospace; font-size: 11px; color: var(--text-faint);
+  }
+  .hero-scan-caption .pulse-dot{
+    display:inline-block; width:6px; height:6px; border-radius:50%; background: var(--teal);
+    box-shadow: 0 0 6px var(--teal); margin-right:6px; animation: pulseDot 1.8s ease-in-out infinite;
+  }
+  @keyframes pulseDot{ 0%,100%{opacity:1;} 50%{opacity:.35;} }
+
+  .roof-slope-N{ fill: #1C2942; }
+  .roof-slope-S{ fill: url(#gradSun); }
+  .roof-slope-E{ fill: url(#gradTeal); }
+  .roof-slope-W{ fill: url(#gradTeal); }
+  .roof-outline{ fill:none; stroke: var(--card-border); stroke-width:1.5; }
+  .roof-hatch{ stroke: #3A4A6B; stroke-width:1; opacity:0.6; }
+  .scan-bar{ animation: scanSweep 3.2s ease-in-out infinite; }
+  @keyframes scanSweep{
+    0%   { transform: translateY(0);   opacity: 0; }
+    8%   { opacity: .9; }
+    50%  { transform: translateY(132px); opacity: .9; }
+    92%  { opacity: 0; }
+    100% { transform: translateY(132px); opacity: 0; }
+  }
+  .panel-dot{ animation: panelPop 3.2s ease-in-out infinite; opacity:0; }
+  @keyframes panelPop{
+    0%, 100% { opacity: 0; transform: scale(0.5); }
+    45%      { opacity: 0; transform: scale(0.5); }
+    58%      { opacity: 1; transform: scale(1); }
+    92%      { opacity: 1; transform: scale(1); }
+  }
+
+  .hero-cta{
+    display:flex; align-items:center; justify-content:center; gap:10px;
+    width:100%;
+    background: linear-gradient(155deg, var(--sun) 0%, #E0951E 100%);
+    color:#1A1200; border:none; border-radius:14px;
+    font-family:'Sora',sans-serif; font-weight:800; font-size:16.5px;
+    padding:17px 20px; cursor:pointer;
+    box-shadow: 0 8px 24px -8px rgba(255,182,39,0.45);
+    transition: transform .12s ease, box-shadow .12s ease;
+  }
+  .hero-cta:hover{ transform: translateY(-1px); box-shadow: 0 10px 28px -8px rgba(255,182,39,0.55); }
+  .hero-cta:active{ transform: translateY(0); }
+  .hero-cta .arrow{ transition: transform .15s ease; }
+  .hero-cta:hover .arrow{ transform: translateX(3px); }
+
+  .trust-line{
+    text-align:center; margin: 12px 0 6px;
+    font-size: 12px; color: var(--text-faint);
+    display:flex; align-items:center; justify-content:center; gap:14px; flex-wrap:wrap;
+  }
+  .trust-line span{ display:flex; align-items:center; gap:5px; }
+
+  .section-divider{
+    display:flex; align-items:center; gap:12px;
+    margin: 34px 0 20px;
+    color: var(--text-faint); font-family:'JetBrains Mono', monospace; font-size:11px;
+    letter-spacing:0.1em; text-transform:uppercase;
+  }
+  .section-divider::before, .section-divider::after{
+    content:''; flex:1; height:1px; background: var(--card-border);
+  }
+
+  .estimate-badge{
+    display:inline-flex; align-items:center; gap:6px;
+    margin-top:10px;
+    font-family:'JetBrains Mono', monospace; font-size:11px; letter-spacing:0.04em;
+    color: var(--text-faint);
+    background: rgba(94,234,212,0.06);
+    border: 1px solid var(--card-border);
+    border-radius: 20px;
+    padding: 5px 12px;
+  }
+  .estimate-badge .dot2{ width:5px; height:5px; border-radius:50%; background:var(--teal); flex-shrink:0; }
+
+  .trust-card{
+    background: linear-gradient(155deg, #17223E 0%, #101A2E 100%);
+    border: 1px solid var(--card-border);
+    border-radius: var(--radius);
+    padding: 20px 22px;
+    margin-bottom: 18px;
+  }
+  .trust-card .card-title{ margin-bottom:14px; }
+  .trust-item{ display:flex; gap:12px; align-items:flex-start; margin-bottom:13px; }
+  .trust-item:last-child{ margin-bottom:0; }
+  .trust-item .ti-icon{ font-size:17px; line-height:1.4; flex-shrink:0; width:22px; text-align:center; }
+  .trust-item .ti-text{ font-size:13px; color: var(--text-dim); line-height:1.5; }
+  .trust-item .ti-text b{ color: var(--text); font-weight:600; }
+  .footnote-heading{
+    font-family:'Sora', sans-serif; font-weight:700; font-size:12.5px;
+    color: var(--text-dim); text-transform:uppercase; letter-spacing:0.04em;
+    margin: 16px 0 6px;
+  }
+  .footnote-heading:first-of-type{ margin-top:18px; }
+
+  .page-footer{
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid var(--card-border);
+    text-align:center;
+  }
+  .page-footer p{
+    font-size: 11.5px; color: var(--text-faint); line-height:1.6;
+    max-width: 44ch; margin: 0 auto;
+  }
+
+  .whatsapp-btn{
+    display:flex; align-items:center; justify-content:center; gap:10px;
+    width:100%; margin-top:18px;
+    background: linear-gradient(155deg, #25D366 0%, #128C7E 100%);
+    color:#06210F; border:none; border-radius:14px;
+    font-family:'Sora',sans-serif; font-weight:800; font-size:15.5px;
+    padding:16px 18px; cursor:pointer;
+    box-shadow: 0 8px 24px -8px rgba(37,211,102,0.45);
+    transition: transform .12s ease, box-shadow .12s ease;
+  }
+  .whatsapp-btn:hover{ transform: translateY(-1px); box-shadow: 0 10px 28px -8px rgba(37,211,102,0.55); }
+  .whatsapp-btn:active{ transform: translateY(0); }
+  .whatsapp-btn .wa-icon{ font-size:19px; }
+  .whatsapp-hint{
+    text-align:center; font-size:11.5px; color: var(--text-faint);
+    margin: 8px 0 0;
+  }
+
+  .card{
+    background: var(--card);
+    border: 1px solid var(--card-border);
+    border-radius: var(--radius);
+    padding: 22px;
+    margin-bottom: 16px;
+  }
+  .card-title{
+    font-family:'Sora', sans-serif;
+    font-weight: 700;
+    font-size: 14px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin: 0 0 18px;
+  }
+
+  .field{ margin-bottom: 16px; }
+  .field:last-child{ margin-bottom: 0; }
+  label{
+    display:block;
+    font-size: 13px;
+    color: var(--text-dim);
+    margin-bottom: 6px;
+  }
+  .input-row{ display:flex; align-items:center; gap:10px; }
+  .prefix{
+    font-family:'JetBrains Mono', monospace;
+    color: var(--text-faint);
+    font-size: 15px;
+  }
+  input[type="number"], input[type="text"], select{
+    width: 100%;
+    background: var(--bg-alt);
+    border: 1px solid var(--card-border);
+    border-radius: 10px;
+    padding: 12px 14px;
+    color: var(--text);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 16px;
+    font-weight: 500;
+    outline: none;
+    transition: border-color .15s ease;
+  }
+  select{ font-family:'Inter', sans-serif; font-weight:500; font-size:14.5px; appearance:none;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' fill='none' stroke='%238FA0BF' stroke-width='2'><path d='M2 4l5 5 5-5'/></svg>");
+    background-repeat: no-repeat; background-position: right 14px center; padding-right: 34px;
+  }
+  input[type="number"]:focus, input[type="text"]:focus, select:focus{ border-color: var(--sun); }
+  input[type="number"]::-webkit-outer-spin-button,
+  input[type="number"]::-webkit-inner-spin-button{ -webkit-appearance:none; margin:0; }
+  .hint{ font-size: 12px; color: var(--text-faint); margin-top: 6px; }
+
+  .roof-btn{
+    display:flex; align-items:center; justify-content:center; gap:8px;
+    width:100%; margin-top:10px;
+    background: linear-gradient(155deg, var(--sun) 0%, #E0951E 100%);
+    color:#1A1200; border:none; border-radius:10px;
+    font-family:'Sora',sans-serif; font-weight:700; font-size:14px;
+    padding:12px 16px; cursor:pointer; transition: opacity .15s ease, transform .1s ease;
+  }
+  .roof-btn:hover{ opacity:0.92; }
+  .roof-btn:active{ transform: scale(0.98); }
+  .roof-btn:disabled{ opacity:0.55; cursor:progress; }
+  .roof-result{
+    margin-top:14px; padding:14px; border-radius:12px;
+    background: var(--bg-alt); border:1px solid var(--card-border);
+    display:none;
+  }
+  .roof-result.show{ display:block; }
+  .roof-result img{ width:100%; border-radius:8px; display:block; margin-bottom:10px; border:1px solid var(--card-border); }
+  .roof-img-wrap{ position: relative; width: 100%; aspect-ratio: 480 / 300; margin-bottom: 10px; }
+  .roof-img-wrap img{ position:absolute; inset:0; width:100%; height:100%; margin-bottom:0; object-fit:cover; }
+  .panel-overlay{ position:absolute; inset:0; pointer-events:none; }
+  .panel-marker{
+    position:absolute; transform: translate(-50%,-50%);
+    border-radius: 1.5px;
+    box-shadow: 0 0 0 1px rgba(0,0,0,0.35);
+    opacity: 0.92;
+  }
+  .panel-marker.dir-south{ background: rgba(255,182,39,0.85); }
+  .panel-marker.dir-west{ background: rgba(94,234,212,0.85); }
+  .panel-marker.dir-east{ background: rgba(94,180,234,0.85); }
+  .panel-overlay-legend{
+    display:flex; gap:14px; margin-top:8px; font-size:10.5px; color: var(--text-faint);
+  }
+  .panel-overlay-legend span{ display:inline-flex; align-items:center; gap:5px; }
+  .panel-overlay-legend .sw{ width:9px; height:9px; border-radius:2px; display:inline-block; }
+  .roof-result .rr-title{ font-family:'JetBrains Mono', monospace; font-size:12px; letter-spacing:0.06em; text-transform:uppercase; color: var(--teal); margin-bottom:8px; }
+  .roof-result .rr-grid{ display:grid; grid-template-columns: repeat(3,1fr); gap:8px; }
+  .roof-result .rr-item{ text-align:center; background: var(--card); border:1px solid var(--card-border); border-radius:8px; padding:8px 4px; }
+  .roof-result .rr-num{ font-family:'JetBrains Mono', monospace; font-size:18px; font-weight:700; color: var(--text); }
+  .roof-result .rr-lbl{ font-size:10.5px; color: var(--text-faint); margin-top:2px; }
+  .roof-result .rr-disclaimer{
+    font-size: 11px; line-height:1.5; color: var(--text-faint);
+    margin: 12px 0 0; padding-top: 10px; border-top: 1px dashed var(--card-border);
+  }
+  .roof-status{ font-size:12.5px; color: var(--text-dim); margin-top:8px; min-height:16px; }
+
+  /* Hero result */
+  .hero{
+    background: linear-gradient(155deg, #17223E 0%, #101A2E 100%);
+    border: 1px solid var(--card-border);
+    border-radius: var(--radius);
+    padding: 26px 22px 22px;
+    margin-bottom: 16px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::after{
+    content:'';
+    position:absolute; top:-60px; right:-60px;
+    width:180px; height:180px; border-radius:50%;
+    background: radial-gradient(circle, rgba(255,182,39,0.18), transparent 70%);
+  }
+  .hero-label{
+    font-family:'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--teal);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .hero-value{
+    font-family:'Sora', sans-serif;
+    font-weight: 800;
+    font-size: 46px;
+    letter-spacing: -0.02em;
+    display:flex;
+    align-items: baseline;
+    gap: 8px;
+  }
+  .hero-value .unit{ font-size: 18px; color: var(--text-dim); font-weight:600; }
+  .hero-sub{ color: var(--text-dim); font-size: 13.5px; margin-top: 6px; }
+
+  .gauge-row{
+    display:flex; align-items:center; gap:16px; margin-top:20px;
+  }
+  .gauge{ flex-shrink:0; }
+  .gauge-legend{ font-size: 12.5px; color: var(--text-dim); line-height:1.7; }
+  .dot{ display:inline-block; width:8px; height:8px; border-radius:50%; margin-right:6px; }
+
+  .grid2{ display:grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+  .stat{
+    background: var(--bg-alt);
+    border: 1px solid var(--card-border);
+    border-radius: 12px;
+    padding: 14px 14px;
+  }
+  .stat-label{ font-size: 11.5px; color: var(--text-faint); text-transform: uppercase; letter-spacing:.05em; margin-bottom:6px; }
+  .stat-value{ font-family:'Sora', sans-serif; font-weight: 700; font-size: 19px; }
+  .stat-value.teal{ color: var(--teal); }
+  .stat-value.sun{ color: var(--sun); }
+
+  .finance-grid{ display:grid; grid-template-columns: repeat(3,1fr); gap:8px; margin-bottom:14px; }
+  .finance-item{
+    text-align:center; background: var(--bg-alt); border:1px solid var(--card-border);
+    border-radius: 10px; padding: 14px 6px;
+  }
+  .finance-label{ font-size: 11px; color: var(--text-faint); text-transform:uppercase; letter-spacing:.05em; margin-bottom:8px; }
+  .finance-value{ font-family:'Sora', sans-serif; font-weight:800; font-size: 18px; color: var(--text); line-height:1.2; }
+  .finance-value span{ font-size:12px; font-weight:600; color: var(--text-faint); }
+
+  .footnote{
+    color: var(--text-faint);
+    font-size: 11.5px;
+    line-height: 1.6;
+    margin-top: 18px;
+    padding-top: 16px;
+    border-top: 1px dashed var(--card-border);
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="lang-switch">
+    <button type="button" class="lang-btn active" id="langBtn-en" onclick="setLanguage('en')">
+      <svg class="flag" viewBox="0 0 30 20" xmlns="http://www.w3.org/2000/svg">
+        <rect width="30" height="20" fill="#B22234"></rect>
+        <rect y="1.54" width="30" height="1.54" fill="#fff"></rect>
+        <rect y="4.62" width="30" height="1.54" fill="#fff"></rect>
+        <rect y="7.69" width="30" height="1.54" fill="#fff"></rect>
+        <rect y="10.77" width="30" height="1.54" fill="#fff"></rect>
+        <rect y="13.85" width="30" height="1.54" fill="#fff"></rect>
+        <rect y="16.92" width="30" height="1.54" fill="#fff"></rect>
+        <rect width="12" height="10.77" fill="#3C3B6E"></rect>
+      </svg>
+      EN
+    </button>
+    <button type="button" class="lang-btn" id="langBtn-es" onclick="setLanguage('es')">
+      <svg class="flag" viewBox="0 0 30 20" xmlns="http://www.w3.org/2000/svg">
+        <rect width="30" height="20" fill="#AA151B"></rect>
+        <rect y="5" width="30" height="10" fill="#F1BF00"></rect>
+      </svg>
+      ES
+    </button>
+    <button type="button" class="lang-btn" id="langBtn-pt" onclick="setLanguage('pt')">
+      <svg class="flag" viewBox="0 0 30 20" xmlns="http://www.w3.org/2000/svg">
+        <rect width="30" height="20" fill="#009739"></rect>
+        <polygon points="15,2.5 28,10 15,17.5 2,10" fill="#FEDD00"></polygon>
+        <circle cx="15" cy="10" r="4.2" fill="#012169"></circle>
+      </svg>
+      PT
+    </button>
+  </div>
+  <div class="eyebrow" data-i18n="eyebrow">Satellite roof scan · Florida homes</div>
+  <h1 data-i18n-html="heroTitle">How many solar panels does <span class="hl-sun">your</span> roof actually fit?</h1>
+  <p class="subtitle" data-i18n="heroSubtitle">Type your address below. We scan real satellite imagery of your home, count the panels that fit on your sunniest roof faces, and show your real solar savings — in under 60 seconds.</p>
+
+  <div class="hero-scan-wrap">
+    <svg viewBox="0 0 320 220" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <lineargradient id="gradSun" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#FFC94D"></stop>
+          <stop offset="100%" stop-color="#B87C1A"></stop>
+        </lineargradient>
+        <lineargradient id="gradTeal" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="#5EEAD4"></stop>
+          <stop offset="100%" stop-color="#2E9E8C"></stop>
+        </lineargradient>
+        <clippath id="roofClip"><rect x="40" y="40" width="240" height="140"></rect></clippath>
+      </defs>
+
+      <!-- Roof, top-down (hip roof): N dimmed & excluded, S/E/W lit & counted -->
+      <g clip-path="url(#roofClip)">
+        <polygon class="roof-slope-N" points="40,40 280,40 200,110 120,110"></polygon>
+        <polygon class="roof-slope-S" points="40,180 280,180 200,110 120,110"></polygon>
+        <polygon class="roof-slope-W" points="40,40 40,180 120,110"></polygon>
+        <polygon class="roof-slope-E" points="280,40 280,180 200,110"></polygon>
+
+        <!-- panel dots, appear as the scan passes -->
+        <circle class="panel-dot" cx="90" cy="150" r="4" style="animation-delay:.15s"></circle>
+        <circle class="panel-dot" cx="110" cy="160" r="4" style="animation-delay:.35s"></circle>
+        <circle class="panel-dot" cx="140" cy="150" r="4" style="animation-delay:.25s"></circle>
+        <circle class="panel-dot" cx="165" cy="160" r="4" style="animation-delay:.5s"></circle>
+        <circle class="panel-dot" cx="190" cy="150" r="4" style="animation-delay:.1s"></circle>
+        <circle class="panel-dot" cx="215" cy="160" r="4" style="animation-delay:.4s"></circle>
+        <circle class="panel-dot" cx="70" cy="90" r="4" style="animation-delay:.6s"></circle>
+        <circle class="panel-dot" cx="65" cy="120" r="4" style="animation-delay:.3s"></circle>
+        <circle class="panel-dot" cx="250" cy="90" r="4" style="animation-delay:.45s"></circle>
+        <circle class="panel-dot" cx="255" cy="120" r="4" style="animation-delay:.2s"></circle>
+
+        <!-- excluded north hatch -->
+        <line class="roof-hatch" x1="60" y1="50" x2="90" y2="70"></line>
+        <line class="roof-hatch" x1="100" y1="50" x2="130" y2="70"></line>
+        <line class="roof-hatch" x1="140" y1="50" x2="170" y2="70"></line>
+        <line class="roof-hatch" x1="180" y1="50" x2="210" y2="70"></line>
+        <line class="roof-hatch" x1="220" y1="50" x2="250" y2="70"></line>
+
+        <!-- sweeping satellite scan line -->
+        <rect class="scan-bar" x="40" y="40" width="240" height="3" fill="var(--teal)" style="filter:drop-shadow(0 0 6px #5EEAD4)"></rect>
+      </g>
+
+      <rect class="roof-outline" x="40" y="40" width="240" height="140" rx="4"></rect>
+      <line class="roof-outline" x1="120" y1="110" x2="200" y2="110"></line>
+      <line class="roof-outline" x1="40" y1="40" x2="120" y2="110"></line>
+      <line class="roof-outline" x1="280" y1="40" x2="200" y2="110"></line>
+      <line class="roof-outline" x1="40" y1="180" x2="120" y2="110"></line>
+      <line class="roof-outline" x1="280" y1="180" x2="200" y2="110"></line>
+
+      <text id="svgNorthLabel" data-i18n="svgNorthLabel" x="160" y="28" text-anchor="middle" font-family="JetBrains Mono" font-size="10.5" letter-spacing="1.5" fill="#5B6C8C">N — EXCLUDED FROM YOUR QUOTE</text>
+      <text id="svgSewLabel" data-i18n="svgSewLabel" x="160" y="200" text-anchor="middle" font-family="JetBrains Mono" font-size="10.5" letter-spacing="1.5" fill="#FFC94D">S / E / W — COUNTED</text>
+    </svg>
+    <div class="hero-scan-caption">
+      <span><span class="pulse-dot"></span><span data-i18n="scanCaption1">Live satellite analysis</span></span>
+      <span data-i18n="scanCaption2">North-facing roof excluded automatically</span>
+    </div>
+  </div>
+
+  <button type="button" class="hero-cta" onclick="scrollToBill()"><span data-i18n="heroCta">Find out — it's free</span> <span class="arrow">→</span></button>
+  <div class="trust-line">
+    <span data-i18n="trust1">⚡ Takes ~60 seconds</span>
+    <span data-i18n="trust2">🛰️ Real satellite imagery</span>
+    <span data-i18n="trust3">🔒 No obligation</span>
+  </div>
+
+  <div class="section-divider" data-i18n="sectionDivider">Start your estimate</div>
+
+  <div class="card">
+    <p class="card-title" data-i18n-html="clientInfoTitle">Client info <span style="color:var(--text-faint); font-weight:400; text-transform:none; letter-spacing:0;">(for the proposal)</span></p>
+    <div class="grid2">
+      <div class="field">
+        <label for="clientName" data-i18n="nameLabel">Name</label>
+        <input type="text" id="clientName" placeholder="Jane Silva" style="font-family:&#39;Inter&#39;,sans-serif; font-size:14.5px; font-weight:400;">
+      </div>
+      <div class="field">
+        <label for="clientPhone" data-i18n="phoneLabel">Phone</label>
+        <input type="text" id="clientPhone" placeholder="(407) 555-0100" style="font-family:&#39;Inter&#39;,sans-serif; font-size:14.5px; font-weight:400;">
+      </div>
+    </div>
+    <div class="field">
+      <label for="clientEmail" data-i18n="emailLabel">Email</label>
+      <input type="text" id="clientEmail" placeholder="jane@email.com" style="font-family:&#39;Inter&#39;,sans-serif; font-size:14.5px; font-weight:400;">
+    </div>
+  </div>
+
+  <div class="card">
+    <p class="card-title" data-i18n="yourDetailsTitle">Your details</p>
+    <div class="field">
+      <label for="bill" data-i18n="billLabel">Average monthly electric bill</label>
+      <div class="input-row">
+        <span class="prefix">$</span>
+        <input type="number" id="bill" value="180" min="0" step="10">
+      </div>
+    </div>
+    <input type="hidden" id="targetPct" value="115">
+    <div class="field">
+      <label for="utility" data-i18n="utilityLabel">Utility company / cooperative</label>
+      <select id="utility">
+        <option value="0.145" data-psh="5.2" data-name="FPL — Florida Power &amp; Light">FPL — Florida Power &amp; Light (~$0.145/kWh)</option>
+        <option value="0.155" data-psh="5.0" data-name="Duke Energy Florida">Duke Energy Florida (~$0.155/kWh)</option>
+        <option value="0.145" data-psh="5.1" data-name="TECO — Tampa Electric">TECO — Tampa Electric (~$0.145/kWh)</option>
+        <option value="0.12" data-psh="5.0" data-name="OUC — Orlando Utilities Commission" selected="">OUC — Orlando Utilities Commission (~$0.12/kWh)</option>
+        <option value="0.12" data-psh="4.8" data-name="JEA — Jacksonville">JEA — Jacksonville (~$0.12/kWh)</option>
+        <option value="0.12" data-psh="5.0" data-name="KUA — Kissimmee Utility Authority">KUA — Kissimmee Utility Authority (~$0.12/kWh)</option>
+        <option value="0.12" data-psh="5.1" data-name="Lakeland Electric">Lakeland Electric (~$0.12/kWh)</option>
+        <option value="0.135" data-psh="4.9" data-name="GRU — Gainesville Regional Utilities">GRU — Gainesville Regional Utilities (~$0.135/kWh)</option>
+        <option value="0.13" data-psh="5.0" data-name="SECO Energy (Sumter Electric Coop.)">SECO Energy — Sumter Electric Coop. (~$0.13/kWh)</option>
+        <option value="0.13" data-psh="4.8" data-name="Clay Electric Cooperative">Clay Electric Cooperative (~$0.13/kWh)</option>
+        <option value="0.13" data-psh="5.2" data-name="Lee County Electric Cooperative (LCEC)">Lee County Electric Coop. — LCEC (~$0.13/kWh)</option>
+        <option value="0.13" data-psh="5.0" data-name="Withlacoochee River Electric Cooperative">Withlacoochee River Electric Coop. (~$0.13/kWh)</option>
+        <option value="0.13" data-psh="5.1" data-name="Peace River Electric Cooperative">Peace River Electric Cooperative (~$0.13/kWh)</option>
+        <option value="0.13" data-psh="4.8" data-name="Talquin Electric Cooperative">Talquin Electric Cooperative (~$0.13/kWh)</option>
+        <option value="0.14" data-psh="5.4" data-name="Florida Keys Electric Cooperative">Florida Keys Electric Cooperative (~$0.14/kWh)</option>
+        <option value="" data-psh="" data-name="Custom">Other / enter rate + sun hours manually</option>
+      </select>
+      <p class="hint" data-i18n="utilityHint">Rates and peak sun hours are 2026 estimates by service territory — both auto-fill below and stay editable. Confirm the rate against the client's bill.</p>
+    </div>
+    <div class="field">
+      <label for="tariff" data-i18n="rateLabel">Electricity rate ($/kWh)</label>
+      <div class="input-row">
+        <span class="prefix">$</span>
+        <input type="number" id="tariff" value="0.12" min="0.01" step="0.01">
+      </div>
+      <p class="hint" data-i18n="rateHint">Auto-filled from the utility above — edit if the client's bill shows a different rate.</p>
+    </div>
+    <input type="hidden" id="psh" value="5.0">
+    <input type="hidden" id="price" value="2100">
+    <div class="field">
+      <label for="roofType" data-i18n="roofTypeLabel">Roof type</label>
+      <select id="roofType">
+        <option value="0" data-name="Asphalt shingle" data-i18n="roofType1">Asphalt shingle (baseline)</option>
+        <option value="-300" data-name="Metal / standing seam" data-i18n="roofType2">Metal / standing seam (−$300, no penetrations)</option>
+        <option value="1000" data-name="Tile / clay" data-i18n="roofType3">Tile / clay (+$1,000, special hooks + breakage risk)</option>
+        <option value="1000" data-name="Flat roof" data-i18n="roofType4">Flat roof (+$1,000, ballasted/tilt mounting)</option>
+      </select>
+      <p class="hint" data-i18n="roofTypeHint">Added or subtracted from total investment as a flat adjustment.</p>
+    </div>
+    <div class="field">
+      <label class="checkbox-label" for="batteryToggle" style="display:flex; align-items:center; gap:10px; cursor:pointer; margin-bottom:0;">
+        <input type="checkbox" id="batteryToggle" style="width:16px; height:16px; accent-color: var(--sun); cursor:pointer;">
+        <span data-i18n-html="batteryLabel">Add Tesla Powerwall 3 battery backup <span style="color:var(--text-faint); font-weight:400;">(optional)</span></span>
+      </label>
+      <div id="batteryQtyField" style="display:none; margin-top:12px;">
+        <label for="batteryQty" data-i18n="batteryQtyLabel">Number of Powerwalls (up to 4)</label>
+        <select id="batteryQty">
+          <option value="1" data-i18n="batteryOpt1">1 Powerwall</option>
+          <option value="2" data-i18n="batteryOpt2">2 Powerwalls</option>
+          <option value="3" data-i18n="batteryOpt3">3 Powerwalls</option>
+          <option value="4" data-i18n="batteryOpt4">4 Powerwalls</option>
+        </select>
+        <p class="hint" id="batteryHint" data-i18n="batteryHintText">First unit $10,000, +$7,500 for each additional unit installed.</p>
+        <p class="hint" style="color:var(--sun); margin-top:8px;" data-i18n="batteryNote">Note: Florida's 1:1 net metering means a battery typically doesn't lower your monthly bill further — its value is backup power during outages, not extra savings. It does extend the payback period since it adds to the investment.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="hero">
+    <div class="hero-label" data-i18n="recSystemSize">Recommended system size</div>
+    <div class="hero-value"><span id="kwp">12.45</span><span class="unit">kW</span></div>
+    <div class="hero-sub" id="modules">≈ 30 × Silfab SIL-415 HC</div>
+
+    <div class="gauge-row">
+      <svg class="gauge" width="88" height="88" viewBox="0 0 88 88">
+        <circle cx="44" cy="44" r="36" fill="none" stroke="#1E2C4A" stroke-width="10"></circle>
+        <circle id="gaugeArc" cx="44" cy="44" r="36" fill="none" stroke="url(#g)" stroke-width="10" stroke-linecap="round" stroke-dasharray="226" stroke-dashoffset="226" transform="rotate(-90 44 44)" style="transition: stroke-dashoffset 0.5s; stroke-dashoffset: 0;"></circle>
+        <defs>
+          <lineargradient id="g" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#FFB627"></stop>
+            <stop offset="100%" stop-color="#5EEAD4"></stop>
+          </lineargradient>
+        </defs>
+        <text id="gaugeText" x="44" y="49" text-anchor="middle" font-family="JetBrains Mono" font-size="15" font-weight="700" fill="#EAF0FB">97%</text>
+      </svg>
+      <div class="gauge-legend">
+        <div><span class="dot" style="background:var(--sun)"></span><span data-i18n="gaugeLegend1">Current usage covered</span></div>
+        <div><span class="dot" style="background:var(--teal)"></span><span id="gaugeLegendExtra">Extra 15% buffer</span></div>
+      </div>
+    </div>
+    <div class="estimate-badge"><span class="dot2"></span><span data-i18n="estimateBadge">Free instant estimate — not a final quote</span></div>
+  </div>
+
+  <div class="card">
+    <p class="card-title" data-i18n="roofPanelTitle">Roof &amp; panel layout</p>
+    <div class="field">
+      <label for="address" data-i18n="addressLabel">Property address</label>
+      <input type="text" id="address" placeholder="123 Main St, Orlando, FL" style="font-family:&#39;Inter&#39;,sans-serif; font-size:14.5px; font-weight:400;">
+      <button type="button" class="roof-btn" id="findRoofBtn" onclick="findRoof()" data-i18n="analyzeBtn">📍 Analyze roof by satellite</button>
+      <div class="roof-status" id="roofStatus"></div>
+      <div class="roof-result" id="roofResult">
+        <div class="roof-img-wrap" id="roofImgWrap">
+          <img id="roofSatImg" src="" alt="Satellite view of the property">
+          <div class="panel-overlay" id="panelOverlay"></div>
+        </div>
+        <div class="panel-overlay-legend">
+          <span><span class="sw" style="background:rgba(255,182,39,0.85)"></span><span data-i18n="southLabel">South</span></span>
+          <span><span class="sw" style="background:rgba(94,234,212,0.85)"></span><span data-i18n="westLabel">West</span></span>
+          <span><span class="sw" style="background:rgba(94,180,234,0.85)"></span><span data-i18n="eastLabel">East</span></span>
+        </div>
+        <div class="rr-title" data-i18n="rrTitle">Where your panels will go (priority: South → West → East)</div>
+        <div class="rr-grid">
+          <div class="rr-item"><div class="rr-num" id="rrSouth">0</div><div class="rr-lbl" data-i18n="southLabel">South</div></div>
+          <div class="rr-item"><div class="rr-num" id="rrWest">0</div><div class="rr-lbl" data-i18n="westLabel">West</div></div>
+          <div class="rr-item"><div class="rr-num" id="rrEast">0</div><div class="rr-lbl" data-i18n="eastLabel">East</div></div>
+        </div>
+        <p class="rr-disclaimer" data-i18n="rrDisclaimer">⚠️ Satellite imagery can't see roof vents, chimneys, skylights, or other obstructions — and doesn't apply required fire-code setback distances. Your installer will confirm the final panel layout on-site, following all local building and fire codes.</p>
+      </div>
+    </div>
+    <input type="hidden" id="roofArea" value="600">
+    <input type="hidden" id="panelModel" value="430|19.8">
+  </div>
+
+  <div class="trust-card">
+    <p class="card-title" data-i18n="trustCardTitle">How this estimate is built</p>
+    <div class="trust-item">
+      <div class="ti-icon">🛰️</div>
+      <div class="ti-text" data-i18n-html="trustItem1"><b>Real satellite roof data</b> — panel counts come from actual imagery of your home, not a guess.</div>
+    </div>
+    <div class="trust-item">
+      <div class="ti-icon">⚡</div>
+      <div class="ti-text" data-i18n-html="trustItem2"><b>Real 2026 Florida utility rates</b> — pulled by provider, not a flat national average.</div>
+    </div>
+    <div class="trust-item">
+      <div class="ti-icon">🧮</div>
+      <div class="ti-text" data-i18n-html="trustItem3"><b>Industry-standard sizing formulas</b> — the same performance ratio and sun-hour math licensed installers use.</div>
+    </div>
+    <div class="trust-item">
+      <div class="ti-icon">✍️</div>
+      <div class="ti-text" data-i18n-html="trustItem4"><b>Never a final price</b> — a licensed installer confirms exact numbers after reviewing your roof, shading, and panel condition in detail. Nothing here is a binding offer.</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <p class="card-title" data-i18n="financialEstimateTitle">Financial estimate</p>
+    <div class="grid2">
+      <div class="stat">
+        <div class="stat-label" data-i18n="statLabel1">Monthly usage</div>
+        <div class="stat-value" id="consumo">1500 kWh</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label" data-i18n="statLabel2">Target generation</div>
+        <div class="stat-value" id="geracao">1725 kWh/mo</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label" data-i18n="statLabel3">Estimated annual generation</div>
+        <div class="stat-value" id="annualGen">17,723 kWh/yr</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label" data-i18n="statLabel4">Estimated investment</div>
+        <div class="stat-value sun" id="invest">$28,635</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label" data-i18n="statLabel5">Monthly savings</div>
+        <div class="stat-value teal" id="economia">$162/mo</div>
+      </div>
+      <div class="stat" id="roofCapStat" style="grid-column: 1 / -1; border-color: var(--danger);">
+        <div class="stat-label" data-i18n="statLabel6">Roof capacity notice</div>
+        <div class="stat-value" id="roofCapText" style="font-size:14px; color:var(--danger);">The usable roof area only fits 30 panels (12.45 kW), which covers about 97% of usage — below the 115% target (needs 14.74 kW).</div>
+      </div>
+      <div class="stat" id="insuranceStat" style="grid-column: 1 / -1; border-color: var(--sun);">
+        <div class="stat-label" data-i18n="statLabel7">Insurance requirement (annual cost)</div>
+        <div class="stat-value" id="insuranceText" style="font-size:14px; color:var(--sun);">This 12.45 kW system is over 10 kW AC (Tier 2), so Florida requires $1M liability insurance for net metering — typically $480–$680 per year depending on the insurer.</div>
+      </div>
+      <div class="stat" id="batteryStat" style="display:none;">
+        <div class="stat-label" data-i18n="statLabel8">Battery backup</div>
+        <div class="stat-value" id="batteryCost">—</div>
+      </div>
+      <div class="stat" style="grid-column: 1 / -1;">
+        <div class="stat-label" data-i18n="statLabel9">Estimated payback</div>
+        <div class="stat-value" id="payback">14.7 years (≈ 177 months)</div>
+      </div>
+      <div class="stat" style="grid-column: 1 / -1;">
+        <div class="stat-label" data-i18n="statLabel10">Projected 25-year savings (utility rate assumed +3%/yr)</div>
+        <div class="stat-value teal" id="savings25">$42,242 net ($70,877 gross)</div>
+      </div>
+    </div>
+
+    <button type="button" class="whatsapp-btn" onclick="sendToWhatsApp()">
+      <span class="wa-icon">💬</span>
+      <span data-i18n="whatsappBtnLabel">I'm interested — send to Sunlight Solar on WhatsApp</span>
+    </button>
+    <p class="whatsapp-hint" data-i18n="whatsappHint">Opens WhatsApp with your info and this estimate already filled in — sent straight to a Sunlight Solar advisor.</p>
+
+    <p class="footnote-heading" data-i18n="footnoteHeading1">How the numbers above are calculated</p>
+    <p class="footnote" data-i18n="footnoteText1">
+      Usage (kWh) = bill ÷ rate. Target generation = usage × your coverage goal.
+      System size (kW) = target generation ÷ (peak sun hours × 30 × 0.78 performance ratio),
+      capped by how many panels actually fit on your roof's South/East/West-facing sections.
+      Roof type adjusts total investment by a flat amount.
+    </p>
+    <p class="footnote-heading" data-i18n="footnoteHeading2">What's included in the investment total</p>
+    <p class="footnote" data-i18n="footnoteText2">
+      Systems over 10 kW AC require $1M liability insurance under Florida's Tier 2 net metering rules
+      (typically $480–$680/year, included above). Battery backup, if selected, is priced separately
+      ($10,000 for the first Powerwall 3, +$7,500 per additional unit) and is included in the total
+      investment and payback period — but not in monthly savings, since Florida's full retail net
+      metering means a battery doesn't reduce your bill further; its value is outage backup. The 25-year
+      projection assumes electricity rates rise 3%/year (Florida's historical average).
+    </p>
+    <p class="footnote-heading" data-i18n="footnoteHeading3">What this estimate is — and isn't</p>
+    <p class="footnote" data-i18n="footnoteText3">
+      This is a pre-sizing estimate meant to help you explore options, not a formal quote or contract.
+      A licensed Florida installer will confirm exact system size, equipment, pricing, and savings after
+      reviewing your roof, shading, structural load, and your utility's interconnection rules —
+      typically with no cost or obligation to you.
+    </p>
+  </div>
+
+  <div class="card">
+    <p class="card-title" data-i18n="financingTitle">Financing</p>
+    <div class="finance-grid">
+      <div class="finance-item">
+        <div class="finance-label" data-i18n="financeCashLabel">Cash</div>
+        <div class="finance-value" id="financeCash">$26,145</div>
+      </div>
+      <div class="finance-item">
+        <div class="finance-label" data-i18n="financeLeaseLabel">Leasing</div>
+        <div class="finance-value" id="financeLease">$142<span>/mo</span></div>
+      </div>
+      <div class="finance-item">
+        <div class="finance-label" data-i18n="financeLoanLabel">Loan</div>
+        <div class="finance-value" id="financeLoan">$204<span>/mo</span></div>
+      </div>
+    </div>
+    <p class="hint" data-i18n="loanDeferralHint">Loan payments begin 5 months after installation — nothing due upfront or during the build.</p>
+    <p class="hint" id="financeQualify" style="margin-top:8px;"></p>
+  </div>
+
+  <div class="page-footer">
+    <p data-i18n="pageFooterText">This tool provides free, educational estimates to help you compare solar options — it is not a binding quote, contract, or offer of credit. Actual system design, pricing, and savings are confirmed in writing by a licensed Florida solar installer before any agreement is signed. Utility rates, incentives, and financing terms shown are current estimates and subject to change.</p>
+  </div>
+</div>
+
+<script>
+function loanPayment(principal, aprPercent, termYears){
+  const n = termYears * 12;
+  const r = (aprPercent / 100) / 12;
+  if (principal <= 0 || n <= 0) return 0;
+  if (r === 0) return principal / n;
+  return principal * r * Math.pow(1 + r, n) / (Math.pow(1 + r, n) - 1);
+}
+
+// Internal financing terms — never shown to the client (no lender names, no APR displayed).
+const LEASE_TERMS = { apr: 2.99, termYears: 25 };
+const LOAN_TERMS  = { apr: 7.75, termYears: 30.5, deferralMonths: 5 };
+
+// ============================================================================
+// TRANSLATIONS — EN / ES / PT. The WhatsApp message sent to Sunlight Solar
+// always stays in English (sendToWhatsApp doesn't use this dictionary).
+// ============================================================================
+let currentLang = 'en';
+let lastPaybackEN = ''; // payback text kept in English regardless of UI language, for the WhatsApp message
+
+const I18N = {
+en: {
+  eyebrow: "Satellite roof scan · Florida homes",
+  heroTitle: 'How many solar panels does <span class="hl-sun">your</span> roof actually fit?',
+  heroSubtitle: "Type your address below. We scan real satellite imagery of your home, count the panels that fit on your sunniest roof faces, and show your real solar savings — in under 60 seconds.",
+  scanCaption1: "Live satellite analysis",
+  scanCaption2: "North-facing roof excluded automatically",
+  svgNorthLabel: "N — EXCLUDED FROM YOUR QUOTE",
+  svgSewLabel: "S / E / W — COUNTED",
+  heroCta: "Find out — it's free",
+  trust1: "⚡ Takes ~60 seconds", trust2: "🛰️ Real satellite imagery", trust3: "🔒 No obligation",
+  sectionDivider: "Start your estimate",
+  clientInfoTitle: 'Client info <span style="color:var(--text-faint); font-weight:400; text-transform:none; letter-spacing:0;">(for the proposal)</span>',
+  nameLabel: "Name", phoneLabel: "Phone", emailLabel: "Email",
+  yourDetailsTitle: "Your details",
+  billLabel: "Average monthly electric bill",
+  utilityLabel: "Utility company / cooperative",
+  utilityHint: "Rates and peak sun hours are 2026 estimates by service territory — both auto-fill below and stay editable. Confirm the rate against the client's bill.",
+  rateLabel: "Electricity rate ($/kWh)",
+  rateHint: "Auto-filled from the utility above — edit if the client's bill shows a different rate.",
+  roofTypeLabel: "Roof type",
+  roofType1: "Asphalt shingle (baseline)",
+  roofType2: "Metal / standing seam (−$300, no penetrations)",
+  roofType3: "Tile / clay (+$1,000, special hooks + breakage risk)",
+  roofType4: "Flat roof (+$1,000, ballasted/tilt mounting)",
+  roofTypeHint: "Added or subtracted from total investment as a flat adjustment.",
+  batteryLabel: 'Add Tesla Powerwall 3 battery backup <span style="color:var(--text-faint); font-weight:400;">(optional)</span>',
+  batteryQtyLabel: "Number of Powerwalls (up to 4)",
+  batteryOpt1: "1 Powerwall", batteryOpt2: "2 Powerwalls", batteryOpt3: "3 Powerwalls", batteryOpt4: "4 Powerwalls",
+  batteryHintText: "First unit $10,000, +$7,500 for each additional unit installed.",
+  batteryNote: "Note: Florida's 1:1 net metering means a battery typically doesn't lower your monthly bill further — its value is backup power during outages, not extra savings. It does extend the payback period since it adds to the investment.",
+  recSystemSize: "Recommended system size",
+  gaugeLegend1: "Current usage covered",
+  gaugeLegendCoverage: "Coverage of current usage",
+  gaugeLegendBuffer: (pct) => `Extra ${pct}% buffer`,
+  estimateBadge: "Free instant estimate — not a final quote",
+  roofPanelTitle: "Roof &amp; panel layout",
+  addressLabel: "Property address",
+  analyzeBtn: "📍 Analyze roof by satellite",
+  analyzeBtnScanning: "📡 Scanning satellite imagery…",
+  roofStatusNoAddress: "Enter the property address above first.",
+  roofStatusMatched: (addr) => `Matched: ${addr}`,
+  roofStatusNoCoverage: "Satellite data isn\u2019t available for this address yet — using a regional estimate instead.",
+  roofStatusFailed: "Could not analyze this address right now — using a regional estimate instead.",
+  southLabel: "South", westLabel: "West", eastLabel: "East",
+  rrTitle: "Where your panels will go (priority: South → West → East)",
+  rrDisclaimer: "⚠️ Satellite imagery can't see roof vents, chimneys, skylights, or other obstructions — and doesn't apply required fire-code setback distances. Your installer will confirm the final panel layout on-site, following all local building and fire codes.",
+  trustCardTitle: "How this estimate is built",
+  trustItem1: "<b>Real satellite roof data</b> — panel counts come from actual imagery of your home, not a guess.",
+  trustItem2: "<b>Real 2026 Florida utility rates</b> — pulled by provider, not a flat national average.",
+  trustItem3: "<b>Industry-standard sizing formulas</b> — the same performance ratio and sun-hour math licensed installers use.",
+  trustItem4: "<b>Never a final price</b> — a licensed installer confirms exact numbers after reviewing your roof, shading, and panel condition in detail. Nothing here is a binding offer.",
+  financialEstimateTitle: "Financial estimate",
+  statLabel1: "Monthly usage", statLabel2: "Target generation", statLabel3: "Estimated annual generation",
+  statLabel4: "Estimated investment", statLabel5: "Monthly savings", statLabel6: "Roof capacity notice",
+  statLabel7: "Insurance requirement (annual cost)", statLabel8: "Battery backup",
+  statLabel9: "Estimated payback", statLabel10: "Projected 25-year savings (utility rate assumed +3%/yr)",
+  modulesText: (n, w) => `≈ ${n} × ${w}W solar panels`,
+  roofCapText: (maxPanels, maxKw, pct, kwNeeded) => `The usable roof area only fits ${maxPanels} panels (${maxKw} kW), which covers about ${pct}% of usage (a full system would need ${kwNeeded} kW).`,
+  insuranceText: (kw) => `This ${kw} kW system is over 10 kW AC (Tier 2), so Florida requires $1M liability insurance for net metering — typically $480–$680 per year depending on the insurer.`,
+  batteryCostText: (qty, cost) => `${qty}× Powerwall 3 — ${cost}`,
+  paybackText: (years, months) => `${years} years (≈ ${months} months)`,
+  savings25Text: (net, gross) => `${net} net (${gross} gross)`,
+  whatsappBtnLabel: "I'm interested — send to Sunlight Solar on WhatsApp",
+  whatsappHint: "Opens WhatsApp with your info and this estimate already filled in — sent straight to a Sunlight Solar advisor.",
+  footnoteHeading1: "How the numbers above are calculated",
+  footnoteText1: "Usage (kWh) = bill ÷ rate. Target generation = usage × your coverage goal. System size (kW) = target generation ÷ (peak sun hours × 30 × 0.78 performance ratio), capped by how many panels actually fit on your roof's South/East/West-facing sections. Roof type adjusts total investment by a flat amount.",
+  footnoteHeading2: "What's included in the investment total",
+  footnoteText2: "Systems over 10 kW AC require $1M liability insurance under Florida's Tier 2 net metering rules (typically $480–$680/year, included above). Battery backup, if selected, is priced separately ($10,000 for the first Powerwall 3, +$7,500 per additional unit) and is included in the total investment and payback period — but not in monthly savings, since Florida's full retail net metering means a battery doesn't reduce your bill further; its value is outage backup. The 25-year projection assumes electricity rates rise 3%/year (Florida's historical average).",
+  footnoteHeading3: "What this estimate is — and isn't",
+  footnoteText3: "This is a pre-sizing estimate meant to help you explore options, not a formal quote or contract. A licensed Florida installer will confirm exact system size, equipment, pricing, and savings after reviewing your roof, shading, structural load, and your utility's interconnection rules — typically with no cost or obligation to you.",
+  financingTitle: "Financing",
+  financeCashLabel: "Cash", financeLeaseLabel: "Leasing", financeLoanLabel: "Loan",
+  loanDeferralHint: "Loan payments begin 5 months after installation — nothing due upfront or during the build.",
+  loanQualifies: (margin) => `<span style="color:var(--teal)">✓ Loan qualifies</span> — payment is $${margin} below the current bill (solar only, min. $40 required)`,
+  loanNotQualified: (margin) => `<span style="color:var(--danger)">✗ Loan doesn't qualify yet</span> — only $${margin} below the bill (solar only). A longer term or lower price may be needed.`,
+  batteryExcludedNote: '<br><span style="color:var(--text-faint); font-size:11.5px;">Battery cost is excluded from this check — the $40 rule is evaluated on the solar-only payment.</span>',
+  pageFooterText: "This tool provides free, educational estimates to help you compare solar options — it is not a binding quote, contract, or offer of credit. Actual system design, pricing, and savings are confirmed in writing by a licensed Florida solar installer before any agreement is signed. Utility rates, incentives, and financing terms shown are current estimates and subject to change.",
+},
+es: {
+  eyebrow: "Escaneo satelital del techo · Hogares de Florida",
+  heroTitle: '¿Cuántos paneles solares caben realmente en <span class="hl-sun">tu</span> techo?',
+  heroSubtitle: "Escribe tu dirección abajo. Escaneamos imágenes satelitales reales de tu casa, contamos los paneles que caben en las secciones más soleadas del techo y te mostramos tu ahorro solar real — en menos de 60 segundos.",
+  scanCaption1: "Análisis satelital en vivo",
+  scanCaption2: "El lado norte del techo se excluye automáticamente",
+  svgNorthLabel: "N — EXCLUIDO DE TU COTIZACIÓN",
+  svgSewLabel: "S / E / O — CONTADOS",
+  heroCta: "Descúbrelo — es gratis",
+  trust1: "⚡ Toma ~60 segundos", trust2: "🛰️ Imágenes satelitales reales", trust3: "🔒 Sin compromiso",
+  sectionDivider: "Comienza tu estimado",
+  clientInfoTitle: 'Datos del cliente <span style="color:var(--text-faint); font-weight:400; text-transform:none; letter-spacing:0;">(para la propuesta)</span>',
+  nameLabel: "Nombre", phoneLabel: "Teléfono", emailLabel: "Correo electrónico",
+  yourDetailsTitle: "Tus datos",
+  billLabel: "Factura eléctrica mensual promedio",
+  utilityLabel: "Compañía eléctrica / cooperativa",
+  utilityHint: "Las tarifas y horas de sol pico son estimados 2026 por zona de servicio — se autocompletan abajo y se pueden editar. Confirma la tarifa con la factura del cliente.",
+  rateLabel: "Tarifa eléctrica ($/kWh)",
+  rateHint: "Autocompletado según la compañía eléctrica de arriba — edítalo si la factura del cliente muestra una tarifa diferente.",
+  roofTypeLabel: "Tipo de techo",
+  roofType1: "Tejas asfálticas (base)",
+  roofType2: "Metal / junta alzada (−$300, sin perforaciones)",
+  roofType3: "Teja / arcilla (+$1,000, ganchos especiales + riesgo de rotura)",
+  roofType4: "Techo plano (+$1,000, montaje con lastre/inclinado)",
+  roofTypeHint: "Se suma o resta de la inversión total como un ajuste fijo.",
+  batteryLabel: 'Agregar respaldo de batería Tesla Powerwall 3 <span style="color:var(--text-faint); font-weight:400;">(opcional)</span>',
+  batteryQtyLabel: "Número de Powerwalls (hasta 4)",
+  batteryOpt1: "1 Powerwall", batteryOpt2: "2 Powerwalls", batteryOpt3: "3 Powerwalls", batteryOpt4: "4 Powerwalls",
+  batteryHintText: "Primera unidad $10,000, +$7,500 por cada unidad adicional instalada.",
+  batteryNote: "Nota: la medición neta 1:1 de Florida significa que una batería normalmente no reduce más tu factura mensual — su valor es la energía de respaldo durante apagones, no ahorro extra. Sí extiende el período de recuperación porque aumenta la inversión.",
+  recSystemSize: "Tamaño de sistema recomendado",
+  gaugeLegend1: "Consumo actual cubierto",
+  gaugeLegendCoverage: "Cobertura del consumo actual",
+  gaugeLegendBuffer: (pct) => `${pct}% de margen extra`,
+  estimateBadge: "Estimado instantáneo gratuito — no es una cotización final",
+  roofPanelTitle: "Techo y disposición de paneles",
+  addressLabel: "Dirección de la propiedad",
+  analyzeBtn: "📍 Analizar techo por satélite",
+  analyzeBtnScanning: "📡 Escaneando imágenes satelitales…",
+  roofStatusNoAddress: "Primero escribe la dirección de la propiedad arriba.",
+  roofStatusMatched: (addr) => `Coincidencia: ${addr}`,
+  roofStatusNoCoverage: "Aún no hay datos satelitales para esta dirección — usando un estimado regional en su lugar.",
+  roofStatusFailed: "No se pudo analizar esta dirección en este momento — usando un estimado regional en su lugar.",
+  southLabel: "Sur", westLabel: "Oeste", eastLabel: "Este",
+  rrTitle: "Dónde irán tus paneles (prioridad: Sur → Oeste → Este)",
+  rrDisclaimer: "⚠️ Las imágenes satelitales no pueden ver ventilaciones, chimeneas, tragaluces u otros obstáculos del techo — ni aplican las distancias de seguridad requeridas por el código contra incendios. Tu instalador confirmará el diseño final de los paneles en el sitio, siguiendo todos los códigos locales de construcción e incendios.",
+  trustCardTitle: "Cómo se construye este estimado",
+  trustItem1: "<b>Datos satelitales reales del techo</b> — el conteo de paneles proviene de imágenes reales de tu casa, no es una suposición.",
+  trustItem2: "<b>Tarifas reales 2026 de servicios de Florida</b> — obtenidas por proveedor, no un promedio nacional fijo.",
+  trustItem3: "<b>Fórmulas de dimensionamiento estándar de la industria</b> — el mismo cálculo de rendimiento y horas de sol que usan los instaladores certificados.",
+  trustItem4: "<b>Nunca un precio final</b> — un instalador certificado confirma los números exactos tras revisar tu techo, sombra y condición de los paneles en detalle. Nada aquí es una oferta vinculante.",
+  financialEstimateTitle: "Estimado financiero",
+  statLabel1: "Consumo mensual", statLabel2: "Generación objetivo", statLabel3: "Generación anual estimada",
+  statLabel4: "Inversión estimada", statLabel5: "Ahorro mensual", statLabel6: "Aviso de capacidad del techo",
+  statLabel7: "Requisito de seguro (costo anual)", statLabel8: "Respaldo de batería",
+  statLabel9: "Retorno de inversión estimado", statLabel10: "Ahorro proyectado a 25 años (tarifa +3%/año)",
+  modulesText: (n, w) => `≈ ${n} × paneles solares de ${w}W`,
+  roofCapText: (maxPanels, maxKw, pct, kwNeeded) => `El área utilizable del techo solo permite ${maxPanels} paneles (${maxKw} kW), lo que cubre cerca del ${pct}% del consumo (un sistema completo necesitaría ${kwNeeded} kW).`,
+  insuranceText: (kw) => `Este sistema de ${kw} kW supera los 10 kW AC (Nivel 2), por lo que Florida exige un seguro de responsabilidad de $1M para la medición neta — típicamente entre $480–$680 al año según la aseguradora.`,
+  batteryCostText: (qty, cost) => `${qty}× Powerwall 3 — ${cost}`,
+  paybackText: (years, months) => `${years} años (≈ ${months} meses)`,
+  savings25Text: (net, gross) => `${net} neto (${gross} bruto)`,
+  whatsappBtnLabel: "Estoy interesado — enviar a Sunlight Solar por WhatsApp",
+  whatsappHint: "Abre WhatsApp con tu información y este estimado ya completado — enviado directo a un asesor de Sunlight Solar.",
+  footnoteHeading1: "Cómo se calculan los números anteriores",
+  footnoteText1: "Consumo (kWh) = factura ÷ tarifa. Generación objetivo = consumo × tu meta de cobertura. Tamaño del sistema (kW) = generación objetivo ÷ (horas de sol pico × 30 × 0.78 de rendimiento), limitado por cuántos paneles caben realmente en las secciones Sur/Este/Oeste de tu techo. El tipo de techo ajusta la inversión total en un monto fijo.",
+  footnoteHeading2: "Qué incluye el total de la inversión",
+  footnoteText2: "Los sistemas de más de 10 kW AC requieren un seguro de responsabilidad de $1M bajo las reglas de medición neta Nivel 2 de Florida (típicamente $480–$680/año, incluido arriba). El respaldo de batería, si se selecciona, se cotiza por separado ($10,000 por la primera Powerwall 3, +$7,500 por cada unidad adicional) y se incluye en la inversión total y el período de recuperación — pero no en el ahorro mensual, ya que la medición neta a tarifa completa de Florida significa que una batería no reduce más tu factura; su valor es el respaldo ante apagones. La proyección a 25 años asume que las tarifas eléctricas suben 3%/año (promedio histórico de Florida).",
+  footnoteHeading3: "Qué es — y qué no es — este estimado",
+  footnoteText3: "Este es un estimado preliminar de dimensionamiento para ayudarte a explorar opciones, no es una cotización formal ni un contrato. Un instalador certificado de Florida confirmará el tamaño exacto del sistema, equipo, precio y ahorro tras revisar tu techo, sombra, carga estructural y las reglas de interconexión de tu compañía eléctrica — normalmente sin costo ni compromiso para ti.",
+  financingTitle: "Financiamiento",
+  financeCashLabel: "Contado", financeLeaseLabel: "Arrendamiento", financeLoanLabel: "Préstamo",
+  loanDeferralHint: "Los pagos del préstamo comienzan 5 meses después de la instalación — nada se paga por adelantado ni durante la construcción.",
+  loanQualifies: (margin) => `<span style="color:var(--teal)">✓ El préstamo califica</span> — el pago es $${margin} menor que la factura actual (solo solar, mínimo $40 requerido)`,
+  loanNotQualified: (margin) => `<span style="color:var(--danger)">✗ El préstamo aún no califica</span> — solo $${margin} menos que la factura (solo solar). Podría necesitarse un plazo más largo o un precio menor.`,
+  batteryExcludedNote: '<br><span style="color:var(--text-faint); font-size:11.5px;">El costo de la batería se excluye de esta verificación — la regla de $40 se evalúa sobre el pago solo solar.</span>',
+  pageFooterText: "Esta herramienta ofrece estimados gratuitos y educativos para ayudarte a comparar opciones solares — no es una cotización vinculante, contrato ni oferta de crédito. El diseño del sistema, precio y ahorro reales se confirman por escrito por un instalador solar certificado de Florida antes de firmar cualquier acuerdo. Las tarifas, incentivos y términos de financiamiento mostrados son estimados actuales y están sujetos a cambios.",
+},
+pt: {
+  eyebrow: "Escaneamento do telhado por satélite · Casas da Flórida",
+  heroTitle: 'Quantos painéis solares realmente cabem no <span class="hl-sun">seu</span> telhado?',
+  heroSubtitle: "Digite seu endereço abaixo. Escaneamos imagens reais de satélite da sua casa, contamos os painéis que cabem nas faces mais ensolaradas do telhado e mostramos sua economia solar real — em menos de 60 segundos.",
+  scanCaption1: "Análise por satélite em tempo real",
+  scanCaption2: "O lado norte do telhado é excluído automaticamente",
+  svgNorthLabel: "N — EXCLUÍDO DA SUA COTAÇÃO",
+  svgSewLabel: "S / L / O — CONTADOS",
+  heroCta: "Descubra — é grátis",
+  trust1: "⚡ Leva ~60 segundos", trust2: "🛰️ Imagens reais de satélite", trust3: "🔒 Sem compromisso",
+  sectionDivider: "Comece sua estimativa",
+  clientInfoTitle: 'Dados do cliente <span style="color:var(--text-faint); font-weight:400; text-transform:none; letter-spacing:0;">(para a proposta)</span>',
+  nameLabel: "Nome", phoneLabel: "Telefone", emailLabel: "E-mail",
+  yourDetailsTitle: "Seus dados",
+  billLabel: "Conta de luz mensal média",
+  utilityLabel: "Concessionária / cooperativa de energia",
+  utilityHint: "Tarifas e horas de sol pico são estimativas de 2026 por área de atendimento — ambas preenchem automaticamente abaixo e podem ser editadas. Confirme a tarifa com a conta do cliente.",
+  rateLabel: "Tarifa de energia ($/kWh)",
+  rateHint: "Preenchido automaticamente pela concessionária acima — edite se a conta do cliente mostrar uma tarifa diferente.",
+  roofTypeLabel: "Tipo de telhado",
+  roofType1: "Telha asfáltica (padrão)",
+  roofType2: "Metálico / encaixe elevado (−$300, sem perfurações)",
+  roofType3: "Telha cerâmica / barro (+$1.000, ganchos especiais + risco de quebra)",
+  roofType4: "Telhado plano (+$1.000, fixação lastreada/inclinada)",
+  roofTypeHint: "Somado ou subtraído do investimento total como um ajuste fixo.",
+  batteryLabel: 'Adicionar bateria de backup Tesla Powerwall 3 <span style="color:var(--text-faint); font-weight:400;">(opcional)</span>',
+  batteryQtyLabel: "Número de Powerwalls (até 4)",
+  batteryOpt1: "1 Powerwall", batteryOpt2: "2 Powerwalls", batteryOpt3: "3 Powerwalls", batteryOpt4: "4 Powerwalls",
+  batteryHintText: "Primeira unidade $10.000, +$7.500 por cada unidade adicional instalada.",
+  batteryNote: "Nota: a medição líquida 1:1 da Flórida significa que uma bateria normalmente não reduz ainda mais sua conta mensal — seu valor é a energia de backup durante quedas de energia, não economia extra. Ela estende o período de retorno, já que aumenta o investimento.",
+  recSystemSize: "Tamanho de sistema recomendado",
+  gaugeLegend1: "Consumo atual coberto",
+  gaugeLegendCoverage: "Cobertura do consumo atual",
+  gaugeLegendBuffer: (pct) => `${pct}% de margem extra`,
+  estimateBadge: "Estimativa instantânea gratuita — não é uma cotação final",
+  roofPanelTitle: "Telhado e disposição dos painéis",
+  addressLabel: "Endereço do imóvel",
+  analyzeBtn: "📍 Analisar telhado por satélite",
+  analyzeBtnScanning: "📡 Escaneando imagens de satélite…",
+  roofStatusNoAddress: "Digite o endereço do imóvel acima primeiro.",
+  roofStatusMatched: (addr) => `Endereço encontrado: ${addr}`,
+  roofStatusNoCoverage: "Ainda não há dados de satélite para este endereço — usando uma estimativa regional.",
+  roofStatusFailed: "Não foi possível analisar este endereço agora — usando uma estimativa regional.",
+  southLabel: "Sul", westLabel: "Oeste", eastLabel: "Leste",
+  rrTitle: "Onde seus painéis vão ficar (prioridade: Sul → Oeste → Leste)",
+  rrDisclaimer: "⚠️ Imagens de satélite não conseguem ver dutos de ventilação, chaminés, claraboias ou outros obstáculos do telhado — e não aplicam as distâncias de segurança exigidas pelo código de incêndio. Seu instalador confirmará o layout final dos painéis no local, seguindo todos os códigos de construção e incêndio locais.",
+  trustCardTitle: "Como esta estimativa é construída",
+  trustItem1: "<b>Dados reais de satélite do telhado</b> — a contagem de painéis vem de imagens reais da sua casa, não é um palpite.",
+  trustItem2: "<b>Tarifas reais de 2026 das concessionárias da Flórida</b> — obtidas por fornecedor, não uma média nacional fixa.",
+  trustItem3: "<b>Fórmulas de dimensionamento padrão da indústria</b> — o mesmo cálculo de rendimento e horas de sol que instaladores licenciados usam.",
+  trustItem4: "<b>Nunca um preço final</b> — um instalador licenciado confirma os números exatos após revisar seu telhado, sombreamento e condição dos painéis em detalhe. Nada aqui é uma oferta vinculante.",
+  financialEstimateTitle: "Estimativa financeira",
+  statLabel1: "Consumo mensal", statLabel2: "Geração alvo", statLabel3: "Geração anual estimada",
+  statLabel4: "Investimento estimado", statLabel5: "Economia mensal", statLabel6: "Aviso de capacidade do telhado",
+  statLabel7: "Exigência de seguro (custo anual)", statLabel8: "Backup de bateria",
+  statLabel9: "Retorno do investimento estimado", statLabel10: "Economia projetada em 25 anos (tarifa +3%/ano)",
+  modulesText: (n, w) => `≈ ${n} × painéis solares de ${w}W`,
+  roofCapText: (maxPanels, maxKw, pct, kwNeeded) => `A área utilizável do telhado só comporta ${maxPanels} painéis (${maxKw} kW), o que cobre cerca de ${pct}% do consumo (um sistema completo precisaria de ${kwNeeded} kW).`,
+  insuranceText: (kw) => `Este sistema de ${kw} kW ultrapassa 10 kW AC (Nível 2), então a Flórida exige seguro de responsabilidade de $1M para medição líquida — normalmente entre $480–$680 por ano, dependendo da seguradora.`,
+  batteryCostText: (qty, cost) => `${qty}× Powerwall 3 — ${cost}`,
+  paybackText: (years, months) => `${years} anos (≈ ${months} meses)`,
+  savings25Text: (net, gross) => `${net} líquido (${gross} bruto)`,
+  whatsappBtnLabel: "Tenho interesse — enviar para a Sunlight Solar pelo WhatsApp",
+  whatsappHint: "Abre o WhatsApp com seus dados e esta estimativa já preenchidos — enviado direto para um consultor da Sunlight Solar.",
+  footnoteHeading1: "Como os números acima são calculados",
+  footnoteText1: "Consumo (kWh) = conta ÷ tarifa. Geração alvo = consumo × sua meta de cobertura. Tamanho do sistema (kW) = geração alvo ÷ (horas de sol pico × 30 × 0,78 de rendimento), limitado por quantos painéis realmente cabem nas seções Sul/Leste/Oeste do seu telhado. O tipo de telhado ajusta o investimento total em um valor fixo.",
+  footnoteHeading2: "O que está incluído no investimento total",
+  footnoteText2: "Sistemas acima de 10 kW AC exigem seguro de responsabilidade de $1M sob as regras de medição líquida Nível 2 da Flórida (normalmente $480–$680/ano, já incluído acima). O backup de bateria, se selecionado, é cobrado separadamente ($10.000 pela primeira Powerwall 3, +$7.500 por unidade adicional) e está incluído no investimento total e no período de retorno — mas não na economia mensal, já que a medição líquida a tarifa integral da Flórida significa que uma bateria não reduz mais sua conta; seu valor é o backup em quedas de energia. A projeção de 25 anos assume que as tarifas de energia sobem 3%/ano (média histórica da Flórida).",
+  footnoteHeading3: "O que esta estimativa é — e não é",
+  footnoteText3: "Esta é uma estimativa preliminar de dimensionamento para ajudá-lo a explorar opções, não é uma cotação formal nem um contrato. Um instalador licenciado da Flórida confirmará o tamanho exato do sistema, equipamento, preço e economia após revisar seu telhado, sombreamento, carga estrutural e as regras de interconexão da sua concessionária — normalmente sem custo ou compromisso para você.",
+  financingTitle: "Financiamento",
+  financeCashLabel: "À vista", financeLeaseLabel: "Leasing", financeLoanLabel: "Empréstimo",
+  loanDeferralHint: "Os pagamentos do empréstimo começam 5 meses após a instalação — nada é devido antecipadamente ou durante a obra.",
+  loanQualifies: (margin) => `<span style="color:var(--teal)">✓ Empréstimo qualifica</span> — o pagamento é $${margin} menor que a conta atual (somente solar, mínimo de $40 exigido)`,
+  loanNotQualified: (margin) => `<span style="color:var(--danger)">✗ Empréstimo ainda não qualifica</span> — apenas $${margin} a menos que a conta (somente solar). Pode ser necessário um prazo maior ou preço menor.`,
+  batteryExcludedNote: '<br><span style="color:var(--text-faint); font-size:11.5px;">O custo da bateria é excluído desta verificação — a regra dos $40 é avaliada sobre o pagamento somente solar.</span>',
+  pageFooterText: "Esta ferramenta oferece estimativas gratuitas e educacionais para ajudá-lo a comparar opções de energia solar — não é uma cotação vinculante, contrato ou oferta de crédito. O design do sistema, preço e economia reais são confirmados por escrito por um instalador solar licenciado da Flórida antes da assinatura de qualquer acordo. Tarifas, incentivos e condições de financiamento mostrados são estimativas atuais e sujeitos a alteração.",
+}
+};
+
+function t(key, ...args){
+  const entry = I18N[currentLang][key] ?? I18N.en[key];
+  return typeof entry === 'function' ? entry(...args) : entry;
+}
+
+function applyStaticTranslations(){
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.getAttribute('data-i18n');
+    el.textContent = t(key);
+  });
+  document.querySelectorAll('[data-i18n-html]').forEach(el => {
+    const key = el.getAttribute('data-i18n-html');
+    el.innerHTML = t(key);
+  });
+}
+
+function setLanguage(lang){
+  currentLang = lang;
+  document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('langBtn-' + lang).classList.add('active');
+  applyStaticTranslations();
+  calc(); // re-render dynamic strings (results, notices, financing) in the new language
+}
+
+// ============================================================================
+
+// --- WhatsApp interest CTA --------------------------------------------------
+const WHATSAPP_PHONE = '14074978867'; // Sunlight Solar — 407-497-8867, US country code included
+
+function sendToWhatsApp(){
+  const name = document.getElementById('clientName').value.trim();
+  const address = document.getElementById('address').value.trim();
+  const kw = document.getElementById('kwp').textContent.trim();
+  const invest = document.getElementById('invest').textContent.trim();
+  const economia = document.getElementById('economia').textContent.trim();
+  const payback = lastPaybackEN || document.getElementById('payback').textContent.trim();
+
+  let msg = `Hi! `;
+  msg += name ? `I'm ${name}. ` : `I'm an interested customer. `;
+  msg += `I ran an online simulation for a ${kw} kW solar system`;
+  msg += address ? ` at ${address}. ` : `. `;
+  msg += `Estimated investment: ${invest}. Estimated monthly savings: ${economia}. Estimated payback: ${payback}. `;
+  msg += `I'd like to get a quote, please.`;
+
+  const url = `https://wa.me/${WHATSAPP_PHONE}?text=${encodeURIComponent(msg)}`;
+  window.open(url, '_blank');
+}
+
+// --- Hero CTA: scroll into the form and focus the first field ---
+function scrollToBill(){
+  const billField = document.getElementById('bill');
+  billField.closest('.card').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  setTimeout(() => billField.focus({ preventScroll: true }), 400);
+}
+
+// --- Draw real panel positions on top of the satellite image -------------
+// Standard Web Mercator projection used by Google Static Maps, so a lat/lng
+// converts to the same pixel position Google used to render the image.
+function latLngToPixel(lat, lng, map){
+  const TILE_SIZE = 256;
+  const scale = Math.pow(2, map.zoom);
+  const project = (la, ln) => {
+    const siny = Math.min(Math.max(Math.sin(la * Math.PI / 180), -0.9999), 0.9999);
+    return {
+      x: TILE_SIZE * (0.5 + ln / 360),
+      y: TILE_SIZE * (0.5 - Math.log((1 + siny) / (1 - siny)) / (4 * Math.PI)),
+    };
+  };
+  const centerPx = project(map.centerLat, map.centerLng);
+  const pointPx = project(lat, lng);
+  return {
+    x: (pointPx.x - centerPx.x) * scale + map.width / 2,
+    y: (pointPx.y - centerPx.y) * scale + map.height / 2,
+  };
+}
+
+function renderPanelOverlay(placeSouth, placeWest, placeEast){
+  const overlay = document.getElementById('panelOverlay');
+  if (!overlay) return;
+  overlay.innerHTML = '';
+  if (!roofPanelData) return;
+
+  const map = roofPanelData.map;
+  const metersPerPixel = 156543.03392 * Math.cos(map.centerLat * Math.PI / 180) / Math.pow(2, map.zoom);
+  const wM = roofPanelData.panelWidthMeters, hM = roofPanelData.panelHeightMeters;
+
+  const draw = (list, count, dirClass) => {
+    list.slice(0, count).forEach((p) => {
+      const px = latLngToPixel(p.lat, p.lng, map);
+      const landscape = (p.orientation || 'LANDSCAPE') === 'LANDSCAPE';
+      const wPx = ((landscape ? hM : wM) / metersPerPixel) * 1.06;
+      const hPx = ((landscape ? wM : hM) / metersPerPixel) * 1.06;
+      const marker = document.createElement('div');
+      marker.className = `panel-marker ${dirClass}`;
+      marker.style.left = `${(px.x / map.width) * 100}%`;
+      marker.style.top = `${(px.y / map.height) * 100}%`;
+      marker.style.width = `${(wPx / map.width) * 100}%`;
+      marker.style.height = `${(hPx / map.height) * 100}%`;
+      overlay.appendChild(marker);
+    });
+  };
+  draw(roofPanelData.south, placeSouth, 'dir-south');
+  draw(roofPanelData.west, placeWest, 'dir-west');
+  draw(roofPanelData.east, placeEast, 'dir-east');
+}
+
+// --- Satellite roof lookup -------------------------------------------------
+// Change this to your deployed backend URL (see backend/README.md for setup).
+const BACKEND_URL = 'https://solar-calculator-backend-v92k.onrender.com';
+let roofMaxPanels = null; // {south, east, west} — max panels satellite detected per face, set after a successful lookup
+let roofPanelData = null; // {south:[{lat,lng,orientation}], east:[...], west:[...], map:{...}, panelWidthMeters, panelHeightMeters} — for the visual overlay
+
+async function findRoof(){
+  const address = document.getElementById('address').value.trim();
+  const statusEl = document.getElementById('roofStatus');
+  const btn = document.getElementById('findRoofBtn');
+  const resultBox = document.getElementById('roofResult');
+
+  if (!address){
+    statusEl.textContent = t('roofStatusNoAddress');
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = t('analyzeBtnScanning');
+  statusEl.textContent = '';
+  resultBox.classList.remove('show');
+
+  try {
+    const res = await fetch(`${BACKEND_URL}/api/roof-lookup?address=${encodeURIComponent(address)}`);
+    if (!res.ok){
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error || 'LOOKUP_FAILED');
+    }
+    const data = await res.json();
+
+    document.getElementById('roofArea').value = data.usableSqFt;
+    roofMaxPanels = { south: data.panelsSouth, east: data.panelsEast, west: data.panelsWest };
+    roofPanelData = {
+      south: data.panelPositions?.south || [],
+      east: data.panelPositions?.east || [],
+      west: data.panelPositions?.west || [],
+      map: data.map,
+      panelWidthMeters: data.panelWidthMeters,
+      panelHeightMeters: data.panelHeightMeters,
+    };
+    if (data.satelliteImageUrl){
+      document.getElementById('roofSatImg').src = data.satelliteImageUrl;
+    }
+    resultBox.classList.add('show');
+    statusEl.textContent = t('roofStatusMatched', data.formattedAddress);
+    calc();
+  } catch (err){
+    // Fail quietly toward the client — keep the default roof area so the
+    // calculator still produces a reasonable result.
+    if (err.message === 'NO_COVERAGE'){
+      statusEl.textContent = t('roofStatusNoCoverage');
+    } else {
+      statusEl.textContent = t('roofStatusFailed');
+    }
+    calc();
+  } finally {
+    btn.disabled = false;
+    btn.textContent = t('analyzeBtn');
+  }
+}
+
+function calc(){
+  const bill = parseFloat(document.getElementById('bill').value) || 0;
+  const tariff = parseFloat(document.getElementById('tariff').value) || 0.01;
+  const psh = parseFloat(document.getElementById('psh').value) || 5.0;
+  const pricePerKw = parseFloat(document.getElementById('price').value) || 0;
+  const targetPct = parseFloat(document.getElementById('targetPct').value) || 100;
+  const roofTypeAdj = parseFloat(document.getElementById('roofType').value) || 0;
+  const PR = 0.78; // performance ratio
+
+  const [panelWStr, panelSqftStr] = document.getElementById('panelModel').value.split('|');
+  const MODULE_W = parseFloat(panelWStr);
+  const MODULE_SQFT = parseFloat(panelSqftStr);
+
+  const roofArea = parseFloat(document.getElementById('roofArea').value) || 0;
+  const maxPanelsRoof = Math.floor(roofArea / MODULE_SQFT);
+  const maxKwRoof = (maxPanelsRoof * MODULE_W) / 1000;
+
+  const batteryOn = document.getElementById('batteryToggle').checked;
+  const batteryQty = batteryOn ? parseInt(document.getElementById('batteryQty').value) : 0;
+  const BATTERY_BASE = 10000;
+  const BATTERY_ADDL = 7500;
+  const batteryTotal = batteryQty > 0 ? BATTERY_BASE + (batteryQty - 1) * BATTERY_ADDL : 0;
+
+  const consumo = bill / tariff;                          // kWh/month
+  const geracaoAlvo = consumo * (targetPct / 100);         // kWh/month, at requested coverage
+  let kw = geracaoAlvo / (psh * 30 * PR);                  // kW DC needed to hit target
+  const kwNeeded = kw;
+  const roofLimited = maxKwRoof > 0 && kw > maxKwRoof;
+  if (roofLimited) kw = maxKwRoof;                         // cap system to what the roof can hold
+
+  const numModules = MODULE_W > 0 ? Math.min(Math.ceil((kw * 1000) / MODULE_W), maxPanelsRoof || Infinity) : 0;
+
+  // Placement plan: allocate the panels actually needed across roof faces,
+  // prioritizing South first, then West, then East (never North).
+  if (roofMaxPanels){
+    let remaining = numModules;
+    const placeSouth = Math.min(remaining, roofMaxPanels.south); remaining -= placeSouth;
+    const placeWest  = Math.min(remaining, roofMaxPanels.west);  remaining -= placeWest;
+    const placeEast  = Math.min(remaining, roofMaxPanels.east);  remaining -= placeEast;
+    document.getElementById('rrSouth').textContent = placeSouth;
+    document.getElementById('rrWest').textContent = placeWest;
+    document.getElementById('rrEast').textContent = placeEast;
+    renderPanelOverlay(placeSouth, placeWest, placeEast);
+  }
+  const annualGenKwh = kw * psh * 365 * PR;                // kWh/year
+  const achievedPct = consumo > 0 ? (kw * psh * 30 * PR / consumo) * 100 : 0;
+
+  const solarInvest = (kw * pricePerKw) + roofTypeAdj;
+  const invest = solarInvest + batteryTotal;
+  const economiaMensal = bill * 0.90;             // assume ~90% net bill reduction (solar only — battery adds no bill savings under FL 1:1 net metering)
+  const paybackMeses = economiaMensal > 0 ? invest / economiaMensal : 0;
+  const paybackAnos = paybackMeses / 12;
+
+  document.getElementById('kwp').textContent = kw.toFixed(2);
+  document.getElementById('modules').textContent = t('modulesText', numModules, MODULE_W);
+  document.getElementById('consumo').textContent = `${consumo.toFixed(0)} kWh`;
+  document.getElementById('geracao').textContent = `${geracaoAlvo.toFixed(0)} kWh/mo`;
+  document.getElementById('annualGen').textContent = `${Math.round(annualGenKwh).toLocaleString('en-US')} kWh/yr`;
+  document.getElementById('invest').textContent =
+    invest.toLocaleString('en-US', {style:'currency', currency:'USD', maximumFractionDigits:0});
+  document.getElementById('economia').textContent =
+    economiaMensal.toLocaleString('en-US', {style:'currency', currency:'USD', maximumFractionDigits:0}) + '/mo';
+  document.getElementById('payback').textContent = t('paybackText', paybackAnos.toFixed(1), Math.round(paybackMeses));
+  lastPaybackEN = `${paybackAnos.toFixed(1)} years (≈ ${Math.round(paybackMeses)} months)`;
+
+  const roofStat = document.getElementById('roofCapStat');
+  if (roofLimited){
+    roofStat.style.display = '';
+    document.getElementById('roofCapText').textContent =
+      t('roofCapText', maxPanelsRoof, maxKwRoof.toFixed(2), achievedPct.toFixed(0), kwNeeded.toFixed(2));
+  } else {
+    roofStat.style.display = 'none';
+  }
+
+  const insuranceStat = document.getElementById('insuranceStat');
+  if (kw > 10){
+    insuranceStat.style.display = '';
+    document.getElementById('insuranceText').textContent = t('insuranceText', kw.toFixed(2));
+  } else {
+    insuranceStat.style.display = 'none';
+  }
+
+  document.getElementById('gaugeText').textContent = `${Math.round(roofLimited ? achievedPct : targetPct)}%`;
+  document.getElementById('gaugeLegendExtra').textContent =
+    targetPct > 100 ? t('gaugeLegendBuffer', (targetPct-100).toFixed(0)) : t('gaugeLegendCoverage');
+
+  const batteryStat = document.getElementById('batteryStat');
+  if (batteryTotal > 0){
+    batteryStat.style.display = '';
+    document.getElementById('batteryCost').textContent = t('batteryCostText', batteryQty,
+      batteryTotal.toLocaleString('en-US', {style:'currency', currency:'USD', maximumFractionDigits:0}));
+  } else {
+    batteryStat.style.display = 'none';
+  }
+
+  // 25-year projected savings, 3%/year utility rate escalation, net of total investment
+  const ESCALATOR = 0.03;
+  let grossSavings25 = 0;
+  let yearSavings = economiaMensal * 12;
+  for (let i = 0; i < 25; i++){
+    grossSavings25 += yearSavings;
+    yearSavings *= (1 + ESCALATOR);
+  }
+  const netSavings25 = grossSavings25 - invest;
+  document.getElementById('savings25').textContent = t('savings25Text',
+    netSavings25.toLocaleString('en-US', {style:'currency', currency:'USD', maximumFractionDigits:0}),
+    grossSavings25.toLocaleString('en-US', {style:'currency', currency:'USD', maximumFractionDigits:0}));
+
+  // --- Financing: show Cash, Leasing, and Loan side by side ---
+  document.getElementById('financeCash').textContent =
+    invest.toLocaleString('en-US', {style:'currency', currency:'USD', maximumFractionDigits:0});
+
+  const leasePayment = loanPayment(invest, LEASE_TERMS.apr, LEASE_TERMS.termYears);
+  document.getElementById('financeLease').innerHTML =
+    leasePayment.toLocaleString('en-US', {style:'currency', currency:'USD', maximumFractionDigits:0}) + '<span>/mo</span>';
+
+  const loanPaymentTotal = loanPayment(invest, LOAN_TERMS.apr, LOAN_TERMS.termYears);
+  const loanPaymentSolarOnly = loanPayment(solarInvest, LOAN_TERMS.apr, LOAN_TERMS.termYears);
+  document.getElementById('financeLoan').innerHTML =
+    loanPaymentTotal.toLocaleString('en-US', {style:'currency', currency:'USD', maximumFractionDigits:0}) + '<span>/mo</span>';
+
+  const qualifyEl = document.getElementById('financeQualify');
+  const margin = bill - loanPaymentSolarOnly;
+  qualifyEl.innerHTML = margin >= 40 ? t('loanQualifies', margin.toFixed(0)) : t('loanNotQualified', margin.toFixed(0));
+  if (batteryTotal > 0){
+    qualifyEl.innerHTML += t('batteryExcludedNote');
+  }
+
+  // gauge animation: circumference = 2*pi*36 ≈ 226
+  const circumference = 226;
+  const displayPct = roofLimited ? achievedPct : targetPct;
+  const offset = circumference * (1 - Math.min(1, 100/displayPct));
+  document.getElementById('gaugeArc').style.transition = 'stroke-dashoffset .5s ease';
+  document.getElementById('gaugeArc').style.strokeDashoffset = offset;
+}
+
+document.getElementById('batteryToggle').addEventListener('change', function(){
+  document.getElementById('batteryQtyField').style.display = this.checked ? '' : 'none';
+  calc();
+});
+document.getElementById('batteryQty').addEventListener('change', calc);
+
+document.getElementById('utility').addEventListener('change', function(){
+  if (this.value !== '') {
+    document.getElementById('tariff').value = this.value;
+    const selectedOption = this.options[this.selectedIndex];
+    const pshVal = selectedOption.getAttribute('data-psh');
+    if (pshVal) document.getElementById('psh').value = pshVal;
+  }
+  calc();
+});
+
+['bill','tariff','psh','price','targetPct','roofArea','panelModel','roofType'].forEach(id => {
+  document.getElementById(id).addEventListener('input', calc);
+  document.getElementById(id).addEventListener('change', calc);
+});
+
+applyStaticTranslations();
+calc();
+</script>
+
+
+</body></html>
