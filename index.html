@@ -1094,36 +1094,6 @@ function latLngToPixel(lat, lng, map){
   };
 }
 
-// Convex hull (monotone chain) — smallest polygon that wraps around a set of points.
-function convexHull(points){
-  if (points.length < 3) return points;
-  const pts = points.slice().sort((a,b) => a.x - b.x || a.y - b.y);
-  const cross = (o,a,b) => (a.x-o.x)*(b.y-o.y) - (a.y-o.y)*(b.x-o.x);
-  const lower = [];
-  for (const p of pts){
-    while (lower.length >= 2 && cross(lower[lower.length-2], lower[lower.length-1], p) <= 0) lower.pop();
-    lower.push(p);
-  }
-  const upper = [];
-  for (let i = pts.length - 1; i >= 0; i--){
-    const p = pts[i];
-    while (upper.length >= 2 && cross(upper[upper.length-2], upper[upper.length-1], p) <= 0) upper.pop();
-    upper.push(p);
-  }
-  upper.pop(); lower.pop();
-  return lower.concat(upper);
-}
-
-// Nudge hull points outward from the centroid a bit — the raw hull only
-// touches panel *centers*, so without this the shaded area looks slightly
-// smaller than the actual panels sitting on the roof.
-function padHull(hull, factor){
-  if (hull.length < 3) return hull;
-  const cx = hull.reduce((s,p) => s + p.x, 0) / hull.length;
-  const cy = hull.reduce((s,p) => s + p.y, 0) / hull.length;
-  return hull.map(p => ({ x: cx + (p.x - cx) * factor, y: cy + (p.y - cy) * factor }));
-}
-
 function renderPanelOverlay(placeSouth, placeWest, placeEast){
   const overlay = document.getElementById('panelOverlay');
   if (!overlay) return;
@@ -1131,20 +1101,30 @@ function renderPanelOverlay(placeSouth, placeWest, placeEast){
   if (!roofPanelData) return;
 
   const map = roofPanelData.map;
+  const boxes = roofPanelData.segmentBoxes || { south: [], west: [], east: [] };
 
-  const drawArea = (list, count, dirClass) => {
-    const selected = list.slice(0, count);
-    if (selected.length < 3) return; // need at least a triangle to shade an area
-    const pxPoints = selected.map(p => latLngToPixel(p.lat, p.lng, map));
-    const hull = padHull(convexHull(pxPoints), 1.28);
-    const poly = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
-    poly.setAttribute('points', hull.map(p => `${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' '));
-    poly.setAttribute('class', `panel-area ${dirClass}`);
-    overlay.appendChild(poly);
+  // Draw the *real* rectangular roof segments Google detected (not a shape
+  // reconstructed from scattered panel points) — only for directions that
+  // are actually receiving panels in this quote.
+  const drawSegments = (segList, dirClass) => {
+    segList.forEach((box) => {
+      const p1 = latLngToPixel(box.sw.lat, box.sw.lng, map);
+      const p2 = latLngToPixel(box.ne.lat, box.ne.lng, map);
+      const x1 = Math.min(p1.x, p2.x), x2 = Math.max(p1.x, p2.x);
+      const y1 = Math.min(p1.y, p2.y), y2 = Math.max(p1.y, p2.y);
+      const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+      rect.setAttribute('x', x1.toFixed(1));
+      rect.setAttribute('y', y1.toFixed(1));
+      rect.setAttribute('width', (x2 - x1).toFixed(1));
+      rect.setAttribute('height', (y2 - y1).toFixed(1));
+      rect.setAttribute('rx', 2);
+      rect.setAttribute('class', `panel-area ${dirClass}`);
+      overlay.appendChild(rect);
+    });
   };
-  drawArea(roofPanelData.south, placeSouth, 'dir-south');
-  drawArea(roofPanelData.west, placeWest, 'dir-west');
-  drawArea(roofPanelData.east, placeEast, 'dir-east');
+  if (placeSouth > 0) drawSegments(boxes.south, 'dir-south');
+  if (placeWest > 0) drawSegments(boxes.west, 'dir-west');
+  if (placeEast > 0) drawSegments(boxes.east, 'dir-east');
 }
 
 // --- Satellite roof lookup -------------------------------------------------
@@ -1186,6 +1166,7 @@ async function findRoof(){
       map: data.map,
       panelWidthMeters: data.panelWidthMeters,
       panelHeightMeters: data.panelHeightMeters,
+      segmentBoxes: data.segmentBoxes || { south: [], west: [], east: [] },
     };
     if (data.satelliteImageUrl){
       document.getElementById('roofSatImg').src = data.satelliteImageUrl;
@@ -1250,7 +1231,9 @@ function calc(){
     document.getElementById('rrSouth').textContent = placeSouth;
     document.getElementById('rrWest').textContent = placeWest;
     document.getElementById('rrEast').textContent = placeEast;
-    renderPanelOverlay(placeSouth, placeWest, placeEast);
+    // Panel-area drawing on the satellite photo is paused for now — numbers above
+    // still show the S/W/E breakdown. Re-enable by uncommenting the line below.
+    // renderPanelOverlay(placeSouth, placeWest, placeEast);
   }
   const annualGenKwh = kw * psh * 365 * PR;                // kWh/year
   const achievedPct = consumo > 0 ? (kw * psh * 30 * PR / consumo) * 100 : 0;
@@ -1329,12 +1312,12 @@ function calc(){
   document.getElementById('financeLoan').innerHTML =
     loanPaymentTotal.toLocaleString('en-US', {style:'currency', currency:'USD', maximumFractionDigits:0}) + '<span>/mo</span>';
 
-  const qualifyEl = document.getElementById('financeQualify');
-  const margin = bill - loanPaymentSolarOnly;
-  qualifyEl.innerHTML = margin >= 40 ? t('loanQualifies', margin.toFixed(0)) : t('loanNotQualified', margin.toFixed(0));
-  if (batteryTotal > 0){
-    qualifyEl.innerHTML += t('batteryExcludedNote');
-  }
+  // Loan qualification check kept computed but hidden from the client for now —
+  // easy to re-enable later by uncommenting the line below.
+  // const qualifyEl = document.getElementById('financeQualify');
+  // const margin = bill - loanPaymentSolarOnly;
+  // qualifyEl.innerHTML = margin >= 40 ? t('loanQualifies', margin.toFixed(0)) : t('loanNotQualified', margin.toFixed(0));
+  // if (batteryTotal > 0){ qualifyEl.innerHTML += t('batteryExcludedNote'); }
 
   // gauge animation: circumference = 2*pi*36 ≈ 226
   const circumference = 226;
