@@ -9,25 +9,26 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sora:wght@600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg: #0B1220;
-    --bg-alt: #101A2E;
-    --card: #131F38;
-    --card-border: #223252;
-    --sun: #FFB627;
-    --sun-soft: #7A5A1E;
-    --teal: #5EEAD4;
-    --text: #EAF0FB;
-    --text-dim: #8FA0BF;
-    --text-faint: #5B6C8C;
-    --danger: #FF8A65;
+    --bg: #FFFFFF;
+    --bg-alt: #F4F6F9;
+    --card: #FFFFFF;
+    --card-border: #E2E7EE;
+    --sun: #F5B400;
+    --sun-text: #96690A;
+    --sun-soft: #FCEBB5;
+    --teal: #163963;
+    --text: #16202E;
+    --text-dim: #55606E;
+    --text-faint: #98A2B0;
+    --danger: #D6484A;
     --radius: 16px;
   }
   *{box-sizing:border-box;}
   html,body{margin:0;padding:0;}
   body{
     background:
-      radial-gradient(ellipse 900px 500px at 15% -10%, rgba(255,182,39,0.10), transparent 60%),
-      radial-gradient(ellipse 700px 500px at 110% 10%, rgba(94,234,212,0.08), transparent 60%),
+      radial-gradient(ellipse 900px 500px at 15% -10%, rgba(245,180,0,0.06), transparent 60%),
+      radial-gradient(ellipse 700px 500px at 110% 10%, rgba(22,57,99,0.05), transparent 60%),
       var(--bg);
     color: var(--text);
     font-family: 'Inter', sans-serif;
@@ -55,7 +56,7 @@
     font-size: 12px;
     letter-spacing: 0.14em;
     text-transform: uppercase;
-    color: var(--sun);
+    color: var(--sun-text);
     display:flex;
     align-items:center;
     gap:8px;
@@ -65,7 +66,7 @@
     content:'';
     width:6px; height:6px; border-radius:50%;
     background: var(--sun);
-    box-shadow: 0 0 8px var(--sun);
+    box-shadow: 0 0 8px rgba(245,180,0,0.5);
   }
   h1{
     font-family:'Sora', sans-serif;
@@ -75,7 +76,7 @@
     margin: 0 0 14px;
     letter-spacing: -0.02em;
   }
-  h1 .hl-sun{ color: var(--sun); }
+  h1 .hl-sun{ color: var(--sun-text); }
   h1 .hl-teal{ color: var(--teal); }
   .subtitle{
     color: var(--text-dim);
@@ -90,8 +91,9 @@
     position: relative;
     margin: 0 0 26px;
     border-radius: var(--radius);
-    background: radial-gradient(ellipse 400px 260px at 50% 40%, rgba(94,234,212,0.07), transparent 70%), var(--card);
+    background: radial-gradient(ellipse 400px 260px at 50% 40%, rgba(22,57,99,0.04), transparent 70%), var(--card);
     border: 1px solid var(--card-border);
+    box-shadow: 0 1px 2px rgba(20,32,46,0.04), 0 8px 20px rgba(20,32,46,0.05);
     padding: 18px 18px 14px;
     overflow: hidden;
   }
@@ -107,12 +109,12 @@
   }
   @keyframes pulseDot{ 0%,100%{opacity:1;} 50%{opacity:.35;} }
 
-  .roof-slope-N{ fill: #1C2942; }
+  .roof-slope-N{ fill: #DCE2EA; }
   .roof-slope-S{ fill: url(#gradSun); }
   .roof-slope-E{ fill: url(#gradTeal); }
   .roof-slope-W{ fill: url(#gradTeal); }
   .roof-outline{ fill:none; stroke: var(--card-border); stroke-width:1.5; }
-  .roof-hatch{ stroke: #3A4A6B; stroke-width:1; opacity:0.6; }
+  .roof-hatch{ stroke: #A9B3C1; stroke-width:1; opacity:0.7; }
   .scan-bar{ animation: scanSweep 3.2s ease-in-out infinite; }
   @keyframes scanSweep{
     0%   { transform: translateY(0);   opacity: 0; }
@@ -132,14 +134,14 @@
   .hero-cta{
     display:flex; align-items:center; justify-content:center; gap:10px;
     width:100%;
-    background: linear-gradient(155deg, var(--sun) 0%, #E0951E 100%);
-    color:#1A1200; border:none; border-radius:14px;
+    background: var(--sun);
+    color:#16202E; border:none; border-radius:999px;
     font-family:'Sora',sans-serif; font-weight:800; font-size:16.5px;
     padding:17px 20px; cursor:pointer;
-    box-shadow: 0 8px 24px -8px rgba(255,182,39,0.45);
+    box-shadow: 0 8px 24px -8px rgba(245,180,0,0.5);
     transition: transform .12s ease, box-shadow .12s ease;
   }
-  .hero-cta:hover{ transform: translateY(-1px); box-shadow: 0 10px 28px -8px rgba(255,182,39,0.55); }
+  .hero-cta:hover{ transform: translateY(-1px); box-shadow: 0 10px 28px -8px rgba(245,180,0,0.6); }
   .hero-cta:active{ transform: translateY(0); }
   .hero-cta .arrow{ transition: transform .15s ease; }
   .hero-cta:hover .arrow{ transform: translateX(3px); }
@@ -166,7 +168,7 @@
     margin-top:10px;
     font-family:'JetBrains Mono', monospace; font-size:11px; letter-spacing:0.04em;
     color: var(--text-faint);
-    background: rgba(94,234,212,0.06);
+    background: rgba(22,57,99,0.05);
     border: 1px solid var(--card-border);
     border-radius: 20px;
     padding: 5px 12px;
@@ -174,7 +176,7 @@
   .estimate-badge .dot2{ width:5px; height:5px; border-radius:50%; background:var(--teal); flex-shrink:0; }
 
   .trust-card{
-    background: linear-gradient(155deg, #17223E 0%, #101A2E 100%);
+    background: #FAFBFD;
     border: 1px solid var(--card-border);
     border-radius: var(--radius);
     padding: 20px 22px;
@@ -208,7 +210,7 @@
     display:flex; align-items:center; justify-content:center; gap:10px;
     width:100%; margin-top:18px;
     background: linear-gradient(155deg, #25D366 0%, #128C7E 100%);
-    color:#06210F; border:none; border-radius:14px;
+    color:#06210F; border:none; border-radius:999px;
     font-family:'Sora',sans-serif; font-weight:800; font-size:15.5px;
     padding:16px 18px; cursor:pointer;
     box-shadow: 0 8px 24px -8px rgba(37,211,102,0.45);
@@ -226,6 +228,7 @@
     background: var(--card);
     border: 1px solid var(--card-border);
     border-radius: var(--radius);
+    box-shadow: 0 1px 2px rgba(20,32,46,0.04), 0 8px 20px rgba(20,32,46,0.05);
     padding: 22px;
     margin-bottom: 16px;
   }
@@ -267,7 +270,7 @@
     transition: border-color .15s ease;
   }
   select{ font-family:'Inter', sans-serif; font-weight:500; font-size:14.5px; appearance:none;
-    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' fill='none' stroke='%238FA0BF' stroke-width='2'><path d='M2 4l5 5 5-5'/></svg>");
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' fill='none' stroke='%2355606E' stroke-width='2'><path d='M2 4l5 5 5-5'/></svg>");
     background-repeat: no-repeat; background-position: right 14px center; padding-right: 34px;
   }
   input[type="number"]:focus, input[type="text"]:focus, select:focus{ border-color: var(--sun); }
@@ -278,8 +281,8 @@
   .roof-btn{
     display:flex; align-items:center; justify-content:center; gap:8px;
     width:100%; margin-top:10px;
-    background: linear-gradient(155deg, var(--sun) 0%, #E0951E 100%);
-    color:#1A1200; border:none; border-radius:10px;
+    background: var(--sun);
+    color:#16202E; border:none; border-radius:999px;
     font-family:'Sora',sans-serif; font-weight:700; font-size:14px;
     padding:12px 16px; cursor:pointer; transition: opacity .15s ease, transform .1s ease;
   }
@@ -296,10 +299,11 @@
   .roof-img-wrap{ position: relative; width: 100%; aspect-ratio: 480 / 300; margin-bottom: 10px; }
   .roof-img-wrap img{ position:absolute; inset:0; width:100%; height:100%; margin-bottom:0; object-fit:cover; }
   .panel-overlay{ position:absolute; inset:0; width:100%; height:100%; pointer-events:none; }
-  .panel-area{ stroke-width: 2; stroke-linejoin: round; }
-  .panel-area.dir-south{ fill: rgba(255,182,39,0.32); stroke: rgba(255,182,39,0.9); }
-  .panel-area.dir-west{ fill: rgba(94,234,212,0.32); stroke: rgba(94,234,212,0.9); }
-  .panel-area.dir-east{ fill: rgba(94,180,234,0.32); stroke: rgba(94,180,234,0.9); }
+  .panel-icon-body{ fill: #1B2735; stroke-width: 1.4; }
+  .panel-icon.dir-south .panel-icon-body{ stroke: #F5B400; }
+  .panel-icon.dir-west .panel-icon-body{ stroke: #3E6FA3; }
+  .panel-icon.dir-east .panel-icon-body{ stroke: #6FA0D6; }
+  .panel-icon-grid{ stroke: rgba(255,255,255,0.32); stroke-width: 0.6; }
   .panel-overlay-legend{
     display:flex; gap:14px; margin-top:8px; font-size:10.5px; color: var(--text-faint);
   }
@@ -318,8 +322,9 @@
 
   /* Hero result */
   .hero{
-    background: linear-gradient(155deg, #17223E 0%, #101A2E 100%);
+    background: linear-gradient(155deg, #F7F9FC 0%, #EFF3F8 100%);
     border: 1px solid var(--card-border);
+    box-shadow: 0 1px 2px rgba(20,32,46,0.04), 0 8px 20px rgba(20,32,46,0.05);
     border-radius: var(--radius);
     padding: 26px 22px 22px;
     margin-bottom: 16px;
@@ -330,7 +335,7 @@
     content:'';
     position:absolute; top:-60px; right:-60px;
     width:180px; height:180px; border-radius:50%;
-    background: radial-gradient(circle, rgba(255,182,39,0.18), transparent 70%);
+    background: radial-gradient(circle, rgba(245,180,0,0.14), transparent 70%);
   }
   .hero-label{
     font-family:'JetBrains Mono', monospace;
@@ -370,7 +375,7 @@
   .stat-label{ font-size: 11.5px; color: var(--text-faint); text-transform: uppercase; letter-spacing:.05em; margin-bottom:6px; }
   .stat-value{ font-family:'Sora', sans-serif; font-weight: 700; font-size: 19px; }
   .stat-value.teal{ color: var(--teal); }
-  .stat-value.sun{ color: var(--sun); }
+  .stat-value.sun{ color: var(--sun-text); }
 
   .finance-grid{ display:grid; grid-template-columns: repeat(3,1fr); gap:8px; margin-bottom:14px; }
   .finance-item{
@@ -435,8 +440,8 @@
           <stop offset="100%" stop-color="#B87C1A"></stop>
         </lineargradient>
         <lineargradient id="gradTeal" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0%" stop-color="#5EEAD4"></stop>
-          <stop offset="100%" stop-color="#2E9E8C"></stop>
+          <stop offset="0%" stop-color="#3E6FA3"></stop>
+          <stop offset="100%" stop-color="#163963"></stop>
         </lineargradient>
         <clippath id="roofClip"><rect x="40" y="40" width="240" height="140"></rect></clippath>
       </defs>
@@ -468,7 +473,7 @@
         <line class="roof-hatch" x1="220" y1="50" x2="250" y2="70"></line>
 
         <!-- sweeping satellite scan line -->
-        <rect class="scan-bar" x="40" y="40" width="240" height="3" fill="var(--teal)" style="filter:drop-shadow(0 0 6px #5EEAD4)"></rect>
+        <rect class="scan-bar" x="40" y="40" width="240" height="3" fill="var(--teal)" style="filter:drop-shadow(0 0 6px #163963)"></rect>
       </g>
 
       <rect class="roof-outline" x="40" y="40" width="240" height="140" rx="4"></rect>
@@ -478,8 +483,8 @@
       <line class="roof-outline" x1="40" y1="180" x2="120" y2="110"></line>
       <line class="roof-outline" x1="280" y1="180" x2="200" y2="110"></line>
 
-      <text id="svgNorthLabel" data-i18n="svgNorthLabel" x="160" y="28" text-anchor="middle" font-family="JetBrains Mono" font-size="10.5" letter-spacing="1.5" fill="#5B6C8C">N — EXCLUDED FROM YOUR QUOTE</text>
-      <text id="svgSewLabel" data-i18n="svgSewLabel" x="160" y="200" text-anchor="middle" font-family="JetBrains Mono" font-size="10.5" letter-spacing="1.5" fill="#FFC94D">S / E / W — COUNTED</text>
+      <text id="svgNorthLabel" data-i18n="svgNorthLabel" x="160" y="28" text-anchor="middle" font-family="JetBrains Mono" font-size="10.5" letter-spacing="1.5" fill="#98A2B0">N — EXCLUDED FROM YOUR QUOTE</text>
+      <text id="svgSewLabel" data-i18n="svgSewLabel" x="160" y="200" text-anchor="middle" font-family="JetBrains Mono" font-size="10.5" letter-spacing="1.5" fill="#96690A">S / E / W — COUNTED</text>
     </svg>
     <div class="hero-scan-caption">
       <span><span class="pulse-dot"></span><span data-i18n="scanCaption1">Live satellite analysis</span></span>
@@ -592,15 +597,15 @@
 
     <div class="gauge-row">
       <svg class="gauge" width="88" height="88" viewBox="0 0 88 88">
-        <circle cx="44" cy="44" r="36" fill="none" stroke="#1E2C4A" stroke-width="10"></circle>
+        <circle cx="44" cy="44" r="36" fill="none" stroke="#E2E7EE" stroke-width="10"></circle>
         <circle id="gaugeArc" cx="44" cy="44" r="36" fill="none" stroke="url(#g)" stroke-width="10" stroke-linecap="round" stroke-dasharray="226" stroke-dashoffset="226" transform="rotate(-90 44 44)" style="transition: stroke-dashoffset 0.5s; stroke-dashoffset: 0;"></circle>
         <defs>
           <lineargradient id="g" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0%" stop-color="#FFB627"></stop>
-            <stop offset="100%" stop-color="#5EEAD4"></stop>
+            <stop offset="0%" stop-color="#F5B400"></stop>
+            <stop offset="100%" stop-color="#163963"></stop>
           </lineargradient>
         </defs>
-        <text id="gaugeText" x="44" y="49" text-anchor="middle" font-family="JetBrains Mono" font-size="15" font-weight="700" fill="#EAF0FB">97%</text>
+        <text id="gaugeText" x="44" y="49" text-anchor="middle" font-family="JetBrains Mono" font-size="15" font-weight="700" fill="#16202E">97%</text>
       </svg>
       <div class="gauge-legend">
         <div><span class="dot" style="background:var(--sun)"></span><span data-i18n="gaugeLegend1">Current usage covered</span></div>
@@ -623,9 +628,9 @@
           <svg class="panel-overlay" id="panelOverlay" viewBox="0 0 480 300" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg"></svg>
         </div>
         <div class="panel-overlay-legend">
-          <span><span class="sw" style="background:rgba(255,182,39,0.85)"></span><span data-i18n="southLabel">South</span></span>
-          <span><span class="sw" style="background:rgba(94,234,212,0.85)"></span><span data-i18n="westLabel">West</span></span>
-          <span><span class="sw" style="background:rgba(94,180,234,0.85)"></span><span data-i18n="eastLabel">East</span></span>
+          <span><span class="sw" style="background:rgba(245,180,0,0.85)"></span><span data-i18n="southLabel">South</span></span>
+          <span><span class="sw" style="background:rgba(22,57,99,0.85)"></span><span data-i18n="westLabel">West</span></span>
+          <span><span class="sw" style="background:rgba(70,130,200,0.85)"></span><span data-i18n="eastLabel">East</span></span>
         </div>
         <div class="rr-title" data-i18n="rrTitle">Where your panels will go (priority: South → West → East)</div>
         <div class="rr-grid">
@@ -753,6 +758,7 @@
       </div>
     </div>
     <p class="hint" data-i18n="loanDeferralHint">Loan payments begin 5 months after installation — nothing due upfront or during the build.</p>
+    <p class="hint" style="margin-top:8px;" data-i18n="priceVariesNote">⚠️ Prices shown are estimates and may change based on your specific project — roof condition, equipment availability, permitting requirements, and site-specific factors can all affect the final price.</p>
     <p class="hint" id="financeQualify" style="margin-top:8px;"></p>
   </div>
 
@@ -855,6 +861,7 @@ en: {
   financingTitle: "Financing",
   financeCashLabel: "Cash", financeLeaseLabel: "Leasing", financeLoanLabel: "Loan",
   loanDeferralHint: "Loan payments begin 5 months after installation — nothing due upfront or during the build.",
+  priceVariesNote: "⚠️ Prices shown are estimates and may change based on your specific project — roof condition, equipment availability, permitting requirements, and site-specific factors can all affect the final price.",
   loanQualifies: (margin) => `<span style="color:var(--teal)">✓ Loan qualifies</span> — payment is $${margin} below the current bill (solar only, min. $40 required)`,
   loanNotQualified: (margin) => `<span style="color:var(--danger)">✗ Loan doesn't qualify yet</span> — only $${margin} below the bill (solar only). A longer term or lower price may be needed.`,
   batteryExcludedNote: '<br><span style="color:var(--text-faint); font-size:11.5px;">Battery cost is excluded from this check — the $40 rule is evaluated on the solar-only payment.</span>',
@@ -933,6 +940,7 @@ es: {
   financingTitle: "Financiamiento",
   financeCashLabel: "Contado", financeLeaseLabel: "Arrendamiento", financeLoanLabel: "Préstamo",
   loanDeferralHint: "Los pagos del préstamo comienzan 5 meses después de la instalación — nada se paga por adelantado ni durante la construcción.",
+  priceVariesNote: "⚠️ Los precios mostrados son estimados y pueden cambiar según tu proyecto específico — la condición del techo, la disponibilidad de equipos, los requisitos de permisos y factores propios del sitio pueden afectar el precio final.",
   loanQualifies: (margin) => `<span style="color:var(--teal)">✓ El préstamo califica</span> — el pago es $${margin} menor que la factura actual (solo solar, mínimo $40 requerido)`,
   loanNotQualified: (margin) => `<span style="color:var(--danger)">✗ El préstamo aún no califica</span> — solo $${margin} menos que la factura (solo solar). Podría necesitarse un plazo más largo o un precio menor.`,
   batteryExcludedNote: '<br><span style="color:var(--text-faint); font-size:11.5px;">El costo de la batería se excluye de esta verificación — la regla de $40 se evalúa sobre el pago solo solar.</span>',
@@ -1011,6 +1019,7 @@ pt: {
   financingTitle: "Financiamento",
   financeCashLabel: "À vista", financeLeaseLabel: "Leasing", financeLoanLabel: "Empréstimo",
   loanDeferralHint: "Os pagamentos do empréstimo começam 5 meses após a instalação — nada é devido antecipadamente ou durante a obra.",
+  priceVariesNote: "⚠️ Os preços mostrados são estimativas e podem mudar de acordo com o seu projeto específico — condição do telhado, disponibilidade de equipamentos, exigências de licenciamento e fatores específicos do local podem afetar o preço final.",
   loanQualifies: (margin) => `<span style="color:var(--teal)">✓ Empréstimo qualifica</span> — o pagamento é $${margin} menor que a conta atual (somente solar, mínimo de $40 exigido)`,
   loanNotQualified: (margin) => `<span style="color:var(--danger)">✗ Empréstimo ainda não qualifica</span> — apenas $${margin} a menos que a conta (somente solar). Pode ser necessário um prazo maior ou preço menor.`,
   batteryExcludedNote: '<br><span style="color:var(--text-faint); font-size:11.5px;">O custo da bateria é excluído desta verificação — a regra dos $40 é avaliada sobre o pagamento somente solar.</span>',
@@ -1101,30 +1110,60 @@ function renderPanelOverlay(placeSouth, placeWest, placeEast){
   if (!roofPanelData) return;
 
   const map = roofPanelData.map;
-  const boxes = roofPanelData.segmentBoxes || { south: [], west: [], east: [] };
+  const metersPerPixel = 156543.03392 * Math.cos(map.centerLat * Math.PI / 180) / Math.pow(2, map.zoom);
+  const wM = roofPanelData.panelWidthMeters, hM = roofPanelData.panelHeightMeters;
 
-  // Draw the *real* rectangular roof segments Google detected (not a shape
-  // reconstructed from scattered panel points) — only for directions that
-  // are actually receiving panels in this quote.
-  const drawSegments = (segList, dirClass) => {
-    segList.forEach((box) => {
-      const p1 = latLngToPixel(box.sw.lat, box.sw.lng, map);
-      const p2 = latLngToPixel(box.ne.lat, box.ne.lng, map);
-      const x1 = Math.min(p1.x, p2.x), x2 = Math.max(p1.x, p2.x);
-      const y1 = Math.min(p1.y, p2.y), y2 = Math.max(p1.y, p2.y);
-      const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-      rect.setAttribute('x', x1.toFixed(1));
-      rect.setAttribute('y', y1.toFixed(1));
-      rect.setAttribute('width', (x2 - x1).toFixed(1));
-      rect.setAttribute('height', (y2 - y1).toFixed(1));
-      rect.setAttribute('rx', 2);
-      rect.setAttribute('class', `panel-area ${dirClass}`);
-      overlay.appendChild(rect);
+  // Baseline compass bearing for a "perfectly aligned" slope in each direction —
+  // real roofs are rarely exactly on-axis with true north, so each panel icon
+  // is rotated by however far its actual roof-segment azimuth deviates from this.
+  const REFERENCE_AZIMUTH = { 'dir-south': 180, 'dir-east': 90, 'dir-west': 270 };
+
+  const drawIcons = (list, count, dirClass) => {
+    list.slice(0, count).forEach((p) => {
+      const px = latLngToPixel(p.lat, p.lng, map);
+      const landscape = (p.orientation || 'LANDSCAPE') === 'LANDSCAPE';
+      const wPx = ((landscape ? hM : wM) / metersPerPixel) * 1.05;
+      const hPx = ((landscape ? wM : hM) / metersPerPixel) * 1.05;
+      const rotation = (p.azimuth != null) ? (p.azimuth - REFERENCE_AZIMUTH[dirClass]) : 0;
+
+      const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+      g.setAttribute('transform',
+        `translate(${px.x.toFixed(1)},${px.y.toFixed(1)}) rotate(${rotation.toFixed(1)})`);
+      g.setAttribute('class', `panel-icon ${dirClass}`);
+
+      // Panel body (dark solar-glass look)
+      const body = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+      body.setAttribute('x', (-wPx/2).toFixed(1));
+      body.setAttribute('y', (-hPx/2).toFixed(1));
+      body.setAttribute('width', wPx.toFixed(1));
+      body.setAttribute('height', hPx.toFixed(1));
+      body.setAttribute('rx', 0.6);
+      body.setAttribute('class', 'panel-icon-body');
+      g.appendChild(body);
+
+      // Cell grid lines (2 columns x 3 rows, like a real panel)
+      for (let i = 1; i <= 1; i++){ // vertical divider(s)
+        const x = -wPx/2 + (wPx/2)*i;
+        const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        line.setAttribute('x1', x.toFixed(1)); line.setAttribute('y1', (-hPx/2).toFixed(1));
+        line.setAttribute('x2', x.toFixed(1)); line.setAttribute('y2', (hPx/2).toFixed(1));
+        line.setAttribute('class', 'panel-icon-grid');
+        g.appendChild(line);
+      }
+      for (let i = 1; i <= 2; i++){ // horizontal dividers
+        const y = -hPx/2 + (hPx/3)*i;
+        const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        line.setAttribute('x1', (-wPx/2).toFixed(1)); line.setAttribute('y1', y.toFixed(1));
+        line.setAttribute('x2', (wPx/2).toFixed(1)); line.setAttribute('y2', y.toFixed(1));
+        line.setAttribute('class', 'panel-icon-grid');
+        g.appendChild(line);
+      }
+      overlay.appendChild(g);
     });
   };
-  if (placeSouth > 0) drawSegments(boxes.south, 'dir-south');
-  if (placeWest > 0) drawSegments(boxes.west, 'dir-west');
-  if (placeEast > 0) drawSegments(boxes.east, 'dir-east');
+  drawIcons(roofPanelData.south, placeSouth, 'dir-south');
+  drawIcons(roofPanelData.west, placeWest, 'dir-west');
+  drawIcons(roofPanelData.east, placeEast, 'dir-east');
 }
 
 // --- Satellite roof lookup -------------------------------------------------
@@ -1231,9 +1270,7 @@ function calc(){
     document.getElementById('rrSouth').textContent = placeSouth;
     document.getElementById('rrWest').textContent = placeWest;
     document.getElementById('rrEast').textContent = placeEast;
-    // Panel-area drawing on the satellite photo is paused for now — numbers above
-    // still show the S/W/E breakdown. Re-enable by uncommenting the line below.
-    // renderPanelOverlay(placeSouth, placeWest, placeEast);
+    renderPanelOverlay(placeSouth, placeWest, placeEast);
   }
   const annualGenKwh = kw * psh * 365 * PR;                // kWh/year
   const achievedPct = consumo > 0 ? (kw * psh * 30 * PR / consumo) * 100 : 0;
